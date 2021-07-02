@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.6;
 
 import "./GovernorNInterfaces.sol";
 
@@ -120,6 +120,12 @@ contract GovernorNDelegate is GovernorNDelegateStorageV1, GovernorNEvents {
         proposalCount++;
         Proposal storage newProposal = proposals[proposalCount];
 
+        Votes memory votes = Votes({
+          inFavor: 0,
+          against: 0,
+          abstain: 0
+        });
+
         newProposal.id = proposalCount;
         newProposal.proposer = msg.sender;
         newProposal.proposalThreshold = temp.proposalThreshold;
@@ -131,9 +137,7 @@ contract GovernorNDelegate is GovernorNDelegateStorageV1, GovernorNEvents {
         newProposal.calldatas = calldatas;
         newProposal.startBlock = temp.startBlock;
         newProposal.endBlock = temp.endBlock;
-        newProposal.forVotes = 0;
-        newProposal.againstVotes = 0;
-        newProposal.abstainVotes = 0;
+        newProposal.votes = votes;
         newProposal.canceled = false;
         newProposal.executed = false;
 
@@ -256,7 +260,7 @@ contract GovernorNDelegate is GovernorNDelegateStorageV1, GovernorNEvents {
             return ProposalState.Pending;
         } else if (block.number <= proposal.endBlock) {
             return ProposalState.Active;
-        } else if (proposal.forVotes <= proposal.againstVotes || proposal.forVotes < proposal.quorumVotes) {
+        } else if (proposal.votes.inFavor <= proposal.votes.against || proposal.votes.abstain < proposal.quorumVotes) {
             return ProposalState.Defeated;
         } else if (proposal.eta == 0) {
             return ProposalState.Succeeded;
@@ -319,11 +323,11 @@ contract GovernorNDelegate is GovernorNDelegateStorageV1, GovernorNEvents {
         uint96 votes = nouns.getPriorVotes(voter, proposal.startBlock-votingDelay);
 
         if (support == 0) {
-            proposal.againstVotes = add256(proposal.againstVotes, votes);
+            proposal.votes.against = add256(proposal.votes.against, votes);
         } else if (support == 1) {
-            proposal.forVotes = add256(proposal.forVotes, votes);
+            proposal.votes.inFavor = add256(proposal.votes.inFavor, votes);
         } else if (support == 2) {
-            proposal.abstainVotes = add256(proposal.abstainVotes, votes);
+            proposal.votes.abstain = add256(proposal.votes.abstain, votes);
         }
 
         receipt.hasVoted = true;

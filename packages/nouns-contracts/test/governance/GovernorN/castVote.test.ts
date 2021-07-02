@@ -7,7 +7,7 @@ const { ethers } = hardhat
 import { BigNumber as EthersBN } from 'ethers';
 
 import {
-  deployNounsErc721,
+  deployNounsERC721,
   getSigners,
   TestSigners,
   MintNouns,
@@ -65,7 +65,7 @@ let mintNouns: (amount: number) => Promise<void>;
 
 async function reset(){
 
-  token = await deployNounsErc721()
+  token = await deployNounsERC721()
 
   mintNouns = MintNouns(token)
 
@@ -147,15 +147,15 @@ describe("GovernorN#castVote/2", () => {
         await token.transferFrom(deployer.address, actor.address, 1);
         await propose(actor)
 
-        let beforeFors = (await gov.proposals(proposalId)).forVotes;
+        const { inFavor: beforeInFavor } = (await gov.proposals(proposalId)).votes;
         await mineBlock();
         await gov.connect(actor).castVote(proposalId, 1);
 
-        let afterFors = (await gov.proposals(proposalId)).forVotes;
+        const { inFavor: afterInFavor } = (await gov.proposals(proposalId)).votes;
 
         const balance = (await token.balanceOf(actor.address)).toString();
 
-        expect(afterFors).to.equal(beforeFors.add(balance));
+        expect(afterInFavor).to.equal(beforeInFavor.add(balance));
       })
 
       it("or AgainstVotes corresponding to the caller's support flag.", async () => {
@@ -165,12 +165,12 @@ describe("GovernorN#castVote/2", () => {
 
         await propose(actor)
 
-        let beforeAgainst = (await gov.proposals(proposalId)).againstVotes;
+        const { against: beforeAgainst } = (await gov.proposals(proposalId)).votes;
 
         await mineBlock();
         await gov.connect(actor).castVote(proposalId, 0);
 
-        let afterAgainst = (await gov.proposals(proposalId)).againstVotes;
+        const { against: afterAgainst } = (await gov.proposals(proposalId)).votes;
 
         const balance = (await token.balanceOf(actor.address)).toString();
 

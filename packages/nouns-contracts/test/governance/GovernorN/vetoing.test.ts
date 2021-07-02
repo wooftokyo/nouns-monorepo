@@ -7,7 +7,7 @@ const { ethers } = hardhat
 import { BigNumber as EthersBN } from 'ethers';
 
 import {
-  deployNounsErc721,
+  deployNounsERC721,
   getSigners,
   TestSigners,
   MintNouns,
@@ -72,7 +72,7 @@ async function reset(): Promise<void> {
   const {address: govDelegateAddress } = await new GovernorNDelegate__factory(deployer).deploy()
 
   // Deploy Nouns token
-  token = await deployNounsErc721()
+  token = await deployNounsERC721()
 
   // bind MintNouns to token contract
   mintNouns = MintNouns(token)

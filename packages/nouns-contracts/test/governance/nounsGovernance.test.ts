@@ -4,7 +4,7 @@ import { ethers } from 'hardhat';
 import { BigNumber as EthersBN } from 'ethers';
 import { NounsErc721 } from '../../typechain';
 import {
-  deployNounsErc721,
+  deployNounsERC721,
   getSigners,
   TestSigners,
   MintNouns,
@@ -46,7 +46,7 @@ describe('Nouns Governance', () => {
 
   beforeEach(async () => {
     signers = await getSigners();
-    token = await deployNounsErc721();
+    token = await deployNounsERC721();
     domain = Domain('Nouns', token.address, await chainId())
     mintNouns = MintNouns(token);
     tokenCallFromGuy = token.connect(signers.account0);

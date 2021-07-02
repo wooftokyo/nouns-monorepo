@@ -7,7 +7,7 @@ const { ethers } = hardhat
 import { BigNumber as EthersBN } from 'ethers';
 
 import {
-  deployNounsErc721,
+  deployNounsERC721,
   getSigners,
   TestSigners,
   MintNouns,
@@ -75,7 +75,7 @@ async function expectState(proposalId: number|EthersBN, expectedState: any){
 
 async function reset(proposer: SignerWithAddress = deployer, mintAmount: number = 5,transferAmount: number = 0, transferTo: SignerWithAddress = proposer, proposalThresholdBPS: number = 1){
 
-  token = await deployNounsErc721()
+  token = await deployNounsERC721()
 
   mintNouns = MintNouns(token)
 

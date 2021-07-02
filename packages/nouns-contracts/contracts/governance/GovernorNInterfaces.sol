@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.6;
 
 contract GovernorNEvents {
     /// @notice An event emitted when a new proposal is created
@@ -138,14 +138,8 @@ contract GovernorNDelegateStorageV1 is GovernorNDelegatorStorage {
         /// @notice The block at which voting ends: votes must be cast prior to this block
         uint endBlock;
 
-        /// @notice Current number of votes in favor of this proposal
-        uint forVotes;
-
-        /// @notice Current number of votes in opposition to this proposal
-        uint againstVotes;
-
-        /// @notice Current number of votes for abstaining for this proposal
-        uint abstainVotes;
+        // @notice Current number of votes on the proposal
+        Votes votes;
 
         /// @notice Flag marking whether the proposal has been canceled
         bool canceled;
@@ -158,6 +152,17 @@ contract GovernorNDelegateStorageV1 is GovernorNDelegatorStorage {
 
         /// @notice Receipts of ballots for the entire set of voters
         mapping (address => Receipt) receipts;
+    }
+
+    struct Votes {
+        /// @notice Current number of votes in favor of this proposal
+        uint inFavor;
+
+        /// @notice Current number of votes in opposition to this proposal
+        uint against;
+
+        /// @notice Current number of votes for abstaining for this proposal
+        uint abstain;
     }
 
     /// @notice Ballot receipt record for a voter

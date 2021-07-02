@@ -7,7 +7,7 @@ const { ethers } = hardhat
 import { BigNumber as EthersBN } from 'ethers';
 
 import {
-  deployNounsErc721,
+  deployNounsERC721,
   getSigners,
   TestSigners,
   MintNouns,
@@ -49,7 +49,7 @@ async function reset(): Promise<void> {
   const {address: govDelegateAddress } = await new GovernorNDelegate__factory(deployer).deploy()
 
   // Deploy Nouns token
-  token = await deployNounsErc721()
+  token = await deployNounsERC721()
 
   // bind MintNouns to token contract
   mintNouns = MintNouns(token)
@@ -190,8 +190,8 @@ describe("GovernorN#inflationHandling", () => {
     await gov.connect(account2).castVote(proposalId,0) // 5
 
     const proposal = await gov.proposals(proposalId);
-    expect(proposal.forVotes).to.equal(6)
-    expect(proposal.againstVotes).to.equal(5)
+    expect(proposal.votes.inFavor).to.equal(6)
+    expect(proposal.votes.against).to.equal(5)
   })
 
   it('succeeds when for forVotes > quorumVotes and againstVotes', async () => {
