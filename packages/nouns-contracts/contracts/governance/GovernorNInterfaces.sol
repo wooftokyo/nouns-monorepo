@@ -156,13 +156,13 @@ contract GovernorNDelegateStorageV1 is GovernorNDelegatorStorage {
 
     struct Votes {
         /// @notice Current number of votes in favor of this proposal
-        uint inFavor;
+        uint forVotes;
 
         /// @notice Current number of votes in opposition to this proposal
-        uint against;
+        uint againstVotes;
 
         /// @notice Current number of votes for abstaining for this proposal
-        uint abstain;
+        uint abstainVotes;
     }
 
     /// @notice Ballot receipt record for a voter

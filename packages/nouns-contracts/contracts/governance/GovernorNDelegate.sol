@@ -121,9 +121,9 @@ contract GovernorNDelegate is GovernorNDelegateStorageV1, GovernorNEvents {
         Proposal storage newProposal = proposals[proposalCount];
 
         Votes memory votes = Votes({
-          inFavor: 0,
-          against: 0,
-          abstain: 0
+          forVotes: 0,
+          againstVotes: 0,
+          abstainVotes: 0
         });
 
         newProposal.id = proposalCount;
@@ -260,7 +260,7 @@ contract GovernorNDelegate is GovernorNDelegateStorageV1, GovernorNEvents {
             return ProposalState.Pending;
         } else if (block.number <= proposal.endBlock) {
             return ProposalState.Active;
-        } else if (proposal.votes.inFavor <= proposal.votes.against || proposal.votes.abstain < proposal.quorumVotes) {
+        } else if (proposal.votes.forVotes <= proposal.votes.againstVotes || proposal.votes.forVotes < proposal.requirements.quorumVotes) {
             return ProposalState.Defeated;
         } else if (proposal.eta == 0) {
             return ProposalState.Succeeded;
@@ -323,11 +323,11 @@ contract GovernorNDelegate is GovernorNDelegateStorageV1, GovernorNEvents {
         uint96 votes = nouns.getPriorVotes(voter, proposal.startBlock-votingDelay);
 
         if (support == 0) {
-            proposal.votes.against = add256(proposal.votes.against, votes);
+            proposal.votes.againstVotes = add256(proposal.votes.againstVotes, votes);
         } else if (support == 1) {
-            proposal.votes.inFavor = add256(proposal.votes.inFavor, votes);
+            proposal.votes.forVotes = add256(proposal.votes.forVotes, votes);
         } else if (support == 2) {
-            proposal.votes.abstain = add256(proposal.votes.abstain, votes);
+            proposal.votes.abstainVotes = add256(proposal.votes.abstainVotes, votes);
         }
 
         receipt.hasVoted = true;
