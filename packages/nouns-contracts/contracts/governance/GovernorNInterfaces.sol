@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.6;
+pragma solidity ^0.8.4;
 
 contract GovernorNEvents {
     /// @notice An event emitted when a new proposal is created
     event ProposalCreated(uint id, address proposer, address[] targets, uint[] values, string[] signatures, bytes[] calldatas, uint startBlock, uint endBlock, string description);
 
-    event ProposalRequirements(uint id, address proposer, uint startBlock, uint endBlock, uint proposalThreshold, uint quorumVotes, string description);
+    event ProposalCreatedWithRequirements(uint id, address proposer, uint startBlock, uint endBlock, uint proposalThreshold, uint quorumVotes, string description);
 
     /// @notice An event emitted when a vote has been cast on a proposal
     /// @param voter The address which casted a vote
@@ -111,12 +111,6 @@ contract GovernorNDelegateStorageV1 is GovernorNDelegatorStorage {
         /// @notice Creator of the proposal
         address proposer;
 
-        /// @notice The number of votes needed to create a proposal at the time of proposal creation. *DIFFERS from GovernerBravo
-        uint proposalThreshold;
-
-        /// @notice The number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed at the time of proposal creation. *DIFFERS from GovernerBravo
-        uint quorumVotes;
-
         /// @notice The timestamp that the proposal will be available for execution, set once the vote succeeds
         uint eta;
 
@@ -138,14 +132,14 @@ contract GovernorNDelegateStorageV1 is GovernorNDelegatorStorage {
         /// @notice The block at which voting ends: votes must be cast prior to this block
         uint endBlock;
 
-        // @notice Current number of votes on the proposal
+        /// @notice Current number of votes on the proposal
         Votes votes;
+
+        /// @notice The requirements for this proposal to be cancellable or pass quorum
+        ProposalRequirements requirements;
 
         /// @notice Flag marking whether the proposal has been canceled
         bool canceled;
-
-        /// @notice Flag marking whether the proposal has been vetoed
-        bool vetoed;
 
         /// @notice Flag marking whether the proposal has been executed
         bool executed;
@@ -163,6 +157,14 @@ contract GovernorNDelegateStorageV1 is GovernorNDelegatorStorage {
 
         /// @notice Current number of votes for abstaining for this proposal
         uint abstainVotes;
+    }
+
+    struct ProposalRequirements {
+        /// @notice The number of votes needed to create a proposal at the time of proposal creation. If the proposer's votes drop below this threshold the proposal can be cancelled.
+        uint proposalThreshold;
+
+        /// @notice The number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed at the time of proposal creation.
+        uint quorumVotes;
     }
 
     /// @notice Ballot receipt record for a voter
@@ -186,8 +188,7 @@ contract GovernorNDelegateStorageV1 is GovernorNDelegatorStorage {
         Succeeded,
         Queued,
         Expired,
-        Executed,
-        Vetoed
+        Executed
     }
 }
 

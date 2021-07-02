@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.6;
+pragma solidity ^0.8.4;
 
 import "./GovernorNInterfaces.sol";
 
@@ -120,6 +120,11 @@ contract GovernorNDelegate is GovernorNDelegateStorageV1, GovernorNEvents {
         proposalCount++;
         Proposal storage newProposal = proposals[proposalCount];
 
+        ProposalRequirements memory requirements = ProposalRequirements({
+            proposalThreshold: temp.proposalThreshold,
+            quorumVotes: bps2Uint(quorumVotesBPS, temp.totalSupply)
+        });
+
         Votes memory votes = Votes({
           forVotes: 0,
           againstVotes: 0,
@@ -128,8 +133,6 @@ contract GovernorNDelegate is GovernorNDelegateStorageV1, GovernorNEvents {
 
         newProposal.id = proposalCount;
         newProposal.proposer = msg.sender;
-        newProposal.proposalThreshold = temp.proposalThreshold;
-        newProposal.quorumVotes = bps2Uint(quorumVotesBPS, temp.totalSupply);
         newProposal.eta = 0;
         newProposal.targets = targets;
         newProposal.values = values;
@@ -138,6 +141,7 @@ contract GovernorNDelegate is GovernorNDelegateStorageV1, GovernorNEvents {
         newProposal.startBlock = temp.startBlock;
         newProposal.endBlock = temp.endBlock;
         newProposal.votes = votes;
+        newProposal.requirements = requirements;
         newProposal.canceled = false;
         newProposal.executed = false;
 
@@ -145,7 +149,7 @@ contract GovernorNDelegate is GovernorNDelegateStorageV1, GovernorNEvents {
 
         emit ProposalCreated(newProposal.id, msg.sender, targets, values, signatures, calldatas, newProposal.startBlock, newProposal.endBlock, description);
 
-        emit ProposalRequirements(newProposal.id, msg.sender, newProposal.startBlock, newProposal.endBlock, newProposal.proposalThreshold, newProposal.quorumVotes, description);
+        emit ProposalCreatedWithRequirements(newProposal.id, msg.sender, newProposal.startBlock, newProposal.endBlock, newProposal.requirements.proposalThreshold, newProposal.requirements.quorumVotes, description);
 
         return newProposal.id;
     }
@@ -192,7 +196,7 @@ contract GovernorNDelegate is GovernorNDelegateStorageV1, GovernorNEvents {
         require(state(proposalId) != ProposalState.Executed, "GovernorN::cancel: cannot cancel executed proposal");
 
         Proposal storage proposal = proposals[proposalId];
-        require(msg.sender == proposal.proposer || nouns.getPriorVotes(proposal.proposer, sub256(block.number, 1)) < proposal.proposalThreshold, "GovernorN::cancel: proposer above threshold");
+        require(msg.sender == proposal.proposer || nouns.getPriorVotes(proposal.proposer, sub256(block.number, 1)) < proposal.requirements.proposalThreshold, "GovernorN::cancel: proposer above threshold");
 
         proposal.canceled = true;
         for (uint i = 0; i < proposal.targets.length; i++) {
@@ -206,20 +210,20 @@ contract GovernorNDelegate is GovernorNDelegateStorageV1, GovernorNEvents {
       * @notice Vetoes a proposal only if sender is the vetoer and the proposal has not been executed.
       * @param proposalId The id of the proposal to veto
       */
-    function veto(uint proposalId) external {
-        require(vetoer != address(0), "GovernorN::veto: veto power burned");
-        require(msg.sender == vetoer, "GovernorN::veto: only vetoer");
-        require(state(proposalId) != ProposalState.Executed, "GovernorN::veto: cannot veto executed proposal");
+    // function veto(uint proposalId) external {
+    //     require(vetoer != address(0), "GovernorN::veto: veto power burned");
+    //     require(msg.sender == vetoer, "GovernorN::veto: only vetoer");
+    //     require(state(proposalId) != ProposalState.Executed, "GovernorN::veto: cannot veto executed proposal");
 
-        Proposal storage proposal = proposals[proposalId];
+    //     Proposal storage proposal = proposals[proposalId];
 
-        proposal.vetoed = true;
-        for (uint i = 0; i < proposal.targets.length; i++) {
-            timelock.cancelTransaction(proposal.targets[i], proposal.values[i], proposal.signatures[i], proposal.calldatas[i], proposal.eta);
-        }
+    //     proposal.vetoed = true;
+    //     for (uint i = 0; i < proposal.targets.length; i++) {
+    //         timelock.cancelTransaction(proposal.targets[i], proposal.values[i], proposal.signatures[i], proposal.calldatas[i], proposal.eta);
+    //     }
 
-        emit ProposalVetoed(proposalId);
-    }
+    //     emit ProposalVetoed(proposalId);
+    // }
 
     /**
       * @notice Gets actions of a proposal
@@ -252,9 +256,7 @@ contract GovernorNDelegate is GovernorNDelegateStorageV1, GovernorNEvents {
     function state(uint proposalId) public view returns (ProposalState) {
         require(proposalCount >= proposalId, "GovernorN::state: invalid proposal id");
         Proposal storage proposal = proposals[proposalId];
-        if (proposal.vetoed) {
-            return ProposalState.Vetoed;
-        } else if (proposal.canceled) {
+        if (proposal.canceled) {
             return ProposalState.Canceled;
         } else if (block.number <= proposal.startBlock) {
             return ProposalState.Pending;
