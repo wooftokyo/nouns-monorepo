@@ -16,6 +16,12 @@ dotenv.config();
 const config: HardhatUserConfig = {
   solidity: {
     version: '0.8.6',
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 9999
+      }
+    }
   },
   networks: {
     mainnet: {
