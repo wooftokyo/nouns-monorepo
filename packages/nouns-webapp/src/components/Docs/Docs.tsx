@@ -35,12 +35,18 @@ const Docs = () => {
       <p>Noun auctions utilize a fork of Zora's auction house. You can see the contracts here:</p>
 
       <h3>Nouns DAO</h3>
-      <p>Nouns DAO utilizes a fork of the Compound Governance framework and is the main governing body of the Nouns ecosystem. Each noun is an irrevocable member of Nouns DAO and entitled to 1 vote in all governance matters. The Nouns DAO treasury recieves 100% of ETH proceeds from daily noun auctions, and is managed entirely and exclusively by the Nouns DAO.
+
+      <p>Nouns DAO utilizes a fork of <a href="https://compound.finance/governance">Compound Governance</a> and is the main governing body of the Nouns ecosystem. The Nouns DAO treasury recieves 100% of ETH proceeds from daily noun auctions, and is managed entirely and exclusively by the Nouns DAO.</p>
+
+      <p>Each noun is an irrevocable member of Nouns DAO and entitled to 1 vote in all governance matters. Nouns' votes are non-transferable (if you sell your Noun the vote goes with it), but they are delegatable, which means you can assign your vote to someone else as long as you own your noun.
       </p>
 
-      <h3>Nounders</h3>
-      <p></p>
+      <p>Nouns Governance contracts are available here:</p>
 
+      <h3>Nounders Reward</h3>
+      <p>'Nounders' are the 10 artists and software developers who created the Nouns project. After the mainnet launch of the project, they will cede control of the project to Nouns DAO. For their efforts initiating the Nouns project, Nounders have rewarded themselves with every 10th noun for the first 5 years of the project.
+      </p>
+      <p>Nouns 0, 10, 20 ... until Noun 1830 will be automatically sent to the Nounder's multi-sig where they will be shared among members of the team.</p>
 
     </div>
 
