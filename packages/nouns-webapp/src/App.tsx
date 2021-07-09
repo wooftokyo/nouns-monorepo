@@ -13,6 +13,7 @@ import CurrentAuction from './components/CurrentAuction';
 import NounGlasses from './components/NounGlasses/NounGlasses';
 import NounBody from './components/NounBody/NounBody';
 import { Container } from 'react-bootstrap';
+import Docs from './components/Docs/Docs'
 
 function App() {
   const { account } = useEthers();
@@ -30,6 +31,9 @@ function App() {
       <Container fluid="lg">
         <Router history={history}>
           <Switch>
+            <Route path="/discover">
+              <Docs />
+            </Route>  
             <Route path="/">
               <NounGlasses />
               <NounBody />

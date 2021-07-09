@@ -16,7 +16,7 @@ const NavBar = () => {
   return (
     <Container>
     <Navbar bg="transparent" expand="lg">
-      <Navbar.Brand href="#home">
+      <Navbar.Brand href="/">
         <img
           src="/logo.svg"
           width="100"
@@ -29,7 +29,7 @@ const NavBar = () => {
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse className="justify-content-end">
         <Nav>
-          <Nav.Link href="#link">Learn</Nav.Link>
+          <Nav.Link href="/discover">Discover</Nav.Link>
           <Navbar.Text>
             {activeAccount ? (
               <ShortAddress>{activeAccount}</ShortAddress>
