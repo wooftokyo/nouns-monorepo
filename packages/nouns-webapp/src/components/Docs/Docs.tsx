@@ -4,7 +4,7 @@ import classes from './Docs.module.css';
 const Docs = () => {
   return (
     <div className={classes.body}>
-    
+
       <h3>Introduction</h3>
       <p>Nouns are an experimental attempt to improve the formation of on-chain avatar communities. While projects such as Cryptopunks have attempted to bootstrap digital community and identity, Nouns attempt to bootstrap identity, community, governance and a treasury that can be used by the community for the creation of long-term value. Additionally, nouns attempt to significantly slow community formation to ensure continuous community growth over time and to incentivize long-term thinking</p>
 
@@ -27,8 +27,23 @@ const Docs = () => {
       </ul>
 
       <h3>Daily Auctions</h3>
-      <p>The nouns auction contract will act as a self-sufficient noun generation and distribution mechanism, auctioning one noun per 24 hour period indefinitely. Each time an auction is settled, the settlement transaction will result in the minting and auction of a new noun by the contract. While settlement is most heavily incentivized for the winning bidder, it can be triggered by anyone, allowing the system to trustlessly auction nouns as long as Ethereum is operational and there are interested participants.</p>
+
+      <p>The nouns auction contract will act as a self-sufficient noun generation and distribution mechanism, auctioning one noun every 24 hours forever. 100% of the proceeds for each auction are automatically deposited in the NounsDAO treasury, where they are governed by noun owners.</p>
+
+      <p>Each time an auction is settled, the settlement transaction will result in the minting and auction of a new noun by the contract. While settlement is most heavily incentivized for the winning bidder, it can be triggered by anyone, allowing the system to trustlessly auction nouns as long as Ethereum is operational and there are interested participants.</p>
+
+      <p>Noun auctions utilize a fork of Zora's auction house. You can see the contracts here:</p>
+
+      <h3>Nouns DAO</h3>
+      <p>Nouns DAO utilizes a fork of the Compound Governance framework and is the main governing body of the Nouns ecosystem. Each noun is an irrevocable member of Nouns DAO and entitled to 1 vote in all governance matters. The Nouns DAO treasury recieves 100% of ETH proceeds from daily noun auctions, and is managed entirely and exclusively by the Nouns DAO.
+      </p>
+
+      <h3>Nounders</h3>
+      <p></p>
+
+
     </div>
+
   );
 };
 export default Docs;
