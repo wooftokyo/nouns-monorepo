@@ -5,7 +5,7 @@
   width: 100%;
   height: 0;
   padding-bottom: 200%; /* when height is 0, padding is used to determine height - this way we can set height based on changing widths */
-  background-color: #c34a62;
+  background-color: #E9265C;
   box-shadow: -25px 20px 0px rgba(0, 0, 0, 0.3);
   position: relative;
   z-index: 6; /* used to stack box-shadows between glasses comps */
@@ -17,7 +17,7 @@
   height: 0;
   padding-bottom: 50%; /* (see note above) sets height of class to be 50% of parent container width when height: 0 */
   width: 100%;
-  background-color: #c34a62;
+  background-color: #E9265C;
   vertical-align: top;
   box-shadow: -25px 20px 0px rgba(0, 0, 0, 0.3);
   position: relative;
