@@ -1,3 +1,17 @@
 .App {
   background-color: #e9c70a;
 }
+
+.navbar{
+  padding:  2rem 0 !important;
+}
+
+.navbar a, .navbar-text{
+  font-size:  1.2rem;
+  color:  #34AC80 !important;
+  font-weight:  bold;
+}
+
+.navbar a{
+  margin-right:  2rem;
+}
