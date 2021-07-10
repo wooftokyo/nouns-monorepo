@@ -36,17 +36,25 @@ const Docs = () => {
 
       <h3>Nouns DAO</h3>
 
-      <p>Nouns DAO utilizes a fork of <a href="https://compound.finance/governance">Compound Governance</a> and is the main governing body of the Nouns ecosystem. The Nouns DAO treasury recieves 100% of ETH proceeds from daily noun auctions, and is managed entirely and exclusively by the Nouns DAO.</p>
+      <p>Nouns DAO utilizes a fork of <a href="https://compound.finance/governance">Compound Governance</a> and is the main governing body of the Nouns ecosystem. The Nouns DAO treasury recieves 100% of ETH proceeds from daily noun auctions.</p>
 
-      <p>Each noun is an irrevocable member of Nouns DAO and entitled to 1 vote in all governance matters. Nouns' votes are non-transferable (if you sell your Noun the vote goes with it), but they are delegatable, which means you can assign your vote to someone else as long as you own your noun.
+      <p>Each noun is an irrevocable member of Nouns DAO and entitled to 1 vote in all governance matters. Noun votes are non-transferable (if you sell your Noun the vote goes with it) and delegatable, which means you can assign your vote to someone else as long as you own your noun.
       </p>
 
       <p>Nouns Governance contracts are available here:</p>
 
       <h3>Nounders Reward</h3>
-      <p>'Nounders' are the 10 artists and software developers who created the Nouns project. After the mainnet launch of the project, they will cede control of the project to Nouns DAO. For their efforts initiating the Nouns project, Nounders have rewarded themselves with every 10th noun for the first 5 years of the project.
-      </p>
-      <p>Nouns 0, 10, 20 ... until Noun 1830 will be automatically sent to the Nounder's multi-sig where they will be shared among members of the team.</p>
+      <p>"Nounders" are a group of ten artists and software developers that created the Nouns project. After the mainnet launch of the project, they will cede control of the project to Nouns DAO.</p>
+
+      <p>As compensation for developing Nouns, Nounders have rewarded themselves every 10th noun for the first 5 years of the project. Nouns 0, 10, 20, 30 and so on, until Noun 1830, will be automatically sent to the Nounder's multi-sig to be shared among the 10 founding members of the project. Assuming even distribution, 10 Nounders will be rewarded with 18 Nouns each over 5 years (the remaining 3 will belong to the group as a whole).</p>
+
+       <p>Nounders Noun distributions don't interfere with the cadence of 24 hour auctions. These Nouns are sent directly to the Nounder's multisig, and auctions continue on schedule with the next noun ID.</p>
+
+      <h3>Noun Traits and Randomness</h3>
+      <p></p>
+
+      <h3>On-Chain Artwork</h3>
+      <p></p>
 
     </div>
 
