@@ -51,7 +51,15 @@ const Docs = () => {
        <p>Nounders Noun distributions don't interfere with the cadence of 24 hour auctions. These Nouns are sent directly to the Nounder's multisig, and auctions continue on schedule with the next noun ID.</p>
 
       <h3>Noun Traits and Randomness</h3>
-      <p></p>
+      <p>Nouns are (for now) unique among avatar projects because they don't incorporate any explicit rules about trait randomness. Each noun is generated from a library of traits using on-chain randomness. Nouns have the following traits:</p>
+
+      <ul>
+        <li>backgrounds: 1/2</li>
+        <li>shirts: 1/X</li>
+        <li>accessories: 1/X</li>
+        <li>heads: 1/X</li>
+        <li>glasses: 1/X</li>
+      </ul>
 
       <h3>On-Chain Artwork</h3>
       <p></p>
