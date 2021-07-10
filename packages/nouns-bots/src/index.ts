@@ -1,4 +1,4 @@
-import { getAuctionCache, getNounPngBuffer, updateAuctionCache } from './utils';
+import { getAuctionCache, getAuctionStartedTweetText, getNounPngBuffer, updateAuctionCache } from './utils';
 import { getLastAuctionId } from './subgraph';
 import { twitter } from './clients';
 
@@ -16,9 +16,7 @@ async function processLastAuction() {
     if(png) {
       const mediaId = await twitter.v1.uploadMedia(png, { type: 'png' });
       await twitter.v1.tweet(
-        `An auction has started for noun #${lastAuctionId}!
-        
-  Learn more at https://nouns.wtf`,
+        getAuctionStartedTweetText(lastAuctionId),
         {
           media_ids: mediaId,
         },
