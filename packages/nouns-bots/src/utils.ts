@@ -1,9 +1,7 @@
 import sharp from 'sharp';
 import { isError, tryF } from 'ts-try';
-import { nounsTokenContract, redis } from './clients';
+import { nounsTokenContract } from './clients';
 import { TokenMetadata } from './types';
-
-export const getAuctionCacheKey = 'NOUNS_AUCTION_CACHE';
 
 /**
  * Get tweet text for auction started.
@@ -14,26 +12,6 @@ export function getAuctionStartedTweetText(auctionId: string | number) {
   return `An auction has started for noun #${auctionId}!
         
   Learn more at https://nouns.wtf`;
-}
-
-/**
- * Get the current cache contents or 0 if empty
- * @returns The current cache contents as number or 0 if null
- */
-export async function getAuctionCache(): Promise<number> {
-  const auctionId = await redis.get(getAuctionCacheKey);
-  if (auctionId) {
-    return Number(auctionId);
-  }
-  return 0;
-}
-
-/**
- * Update the auction cache with `id`
- * @param id 
- */
-export async function updateAuctionCache(id: number) {
-  await redis.set(getAuctionCacheKey, id);
 }
 
 /**
@@ -53,4 +31,13 @@ export async function getNounPngBuffer(tokenId: string): Promise<Buffer | undefi
   );
   const svg = Buffer.from(data.image.substring(26), 'base64');
   return sharp(svg).png().toBuffer();
+}
+
+export async function getNounOwnerAddress(tokenId: string): Promise<string | undefined> {
+  const owner = await tryF(() => nounsTokenContract.ownerOf(tokenId));
+  if (isError(owner)) {
+    console.error(`Error fetching ownerOf for token ID ${tokenId}: ${owner.message}`);
+    return;
+  }
+  return owner;
 }
