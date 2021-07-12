@@ -26,11 +26,27 @@ async function processLastAuction() {
   }
 }
 
-setInterval(
-  async () => processLastAuction(),
-  30000,
-)
+async function a() {
+  const res = await twitter.v1.mentionTimeline(
+    {
+      since_id: '1413744415995097000',
+    }
+  );
+  for await (const tweet of res) {
+    console.log('tweet', tweet);
+  }
 
-processLastAuction().then(
+  // const currentUser = await twitter.currentUser();
+  // console.log('id str', currentUser.id_str)
+  // const res2 = await twitter.v2.follow(currentUser.id_str, '1075129604614938624');
+  // console.log('follow', res2)
+}
+
+// setInterval(
+//   async () => processLastAuction(),
+//   30000,
+// )
+
+a().then(
   () => 'processLastAuction',
 );
