@@ -1,3 +1,14 @@
+@font-face {
+  font-family: "nountown";
+  src: url("./nountown.otf");
+}
+
 .body {
-  margin-top: 7rem;
+  background-color: white;
+  margin-top:  3rem;
+}
+
+h3{
+    font-family: nountown;
+    font-size:  5rem;
 }
