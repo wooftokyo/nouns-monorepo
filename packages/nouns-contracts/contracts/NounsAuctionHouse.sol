@@ -170,6 +170,18 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
     }
 
     /**
+     * @notice Get the minimum bid increment percentage.
+     */
+    function getMinBidIncrementPercentage() external override view returns (uint8) {
+        return minBidIncrementPercentage;
+    }
+
+    function getCurrentAuction() external override view returns (uint256) {
+        INounsAuctionHouse.Auction memory _auction = auction;
+        return _auction.nounId;
+    }
+
+    /**
      * @notice Create an auction.
      * @dev Store the auction details in the `auction` state variable and emit an AuctionCreated event.
      * If the mint reverts, the minter was updated without pausing this contract first. To remedy this,
