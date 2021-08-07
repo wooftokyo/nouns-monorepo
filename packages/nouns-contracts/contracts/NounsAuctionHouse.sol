@@ -27,13 +27,13 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
     uint256 public reservePrice;
 
     // The minimum percentage difference between the last bid amount and the current bid
-    uint8 public minBidIncrementPercentage;
+    uint8 public override minBidIncrementPercentage;
 
     // The duration of a single auction
     uint256 public duration;
 
     // The active auction
-    INounsAuctionHouse.Auction public auction;
+    INounsAuctionHouse.Auction public override auction;
 
     /**
      * @notice Initialize the auction house and base contracts,
@@ -167,18 +167,6 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
         minBidIncrementPercentage = _minBidIncrementPercentage;
 
         emit AuctionMinBidIncrementPercentageUpdated(_minBidIncrementPercentage);
-    }
-
-    /**
-     * @notice Get the minimum bid increment percentage.
-     */
-    function getMinBidIncrementPercentage() external override view returns (uint8) {
-        return minBidIncrementPercentage;
-    }
-
-    function getCurrentAuction() external override view returns (uint256) {
-        INounsAuctionHouse.Auction memory _auction = auction;
-        return _auction.nounId;
     }
 
     /**

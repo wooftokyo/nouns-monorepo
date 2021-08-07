@@ -51,7 +51,7 @@ interface INounsAuctionHouse {
 
     function setMinBidIncrementPercentage(uint8 minBidIncrementPercentage) external;
 
-    function getMinBidIncrementPercentage() external view returns (uint8);
+    function minBidIncrementPercentage() external view returns (uint8);
 
-    function getCurrentAuction() external view returns (uint256);
+    function auction() external view returns (uint256, uint256, uint256, uint256, address payable, bool);
 }
