@@ -92,8 +92,10 @@ describe('Fund Nouns DAO proposal using Sablier streams', async () => {
   let streamId: number;  // We will use `nextStreamId` to cache this for testing. Normally it would be retrieved from the `CreateStream` event log
 
   before(async () => {
-    [recipient, sender] = await ethers.getSigners();
+    [recipient] = await ethers.getSigners();
+
     await networkReset()
+
     nounOwner = await ethers.provider.getSigner(NOUN_OWNER_ADDRESS)
     sablier = Sablier__factory.connect(SABLIER_ADDRESS, ethers.provider)
     weth = Weth__factory.connect(WETH_ADDRESS, ethers.provider)
@@ -226,7 +228,7 @@ describe('Fund Nouns DAO proposal using Sablier streams', async () => {
   it('should pay recipient and refund Nouns DAO correctly', async () => {
     const { eta: executedBlockTimestamp } = await gov.proposals(proposalId);
 
-    const streamElapsed = executedBlockTimestamp.sub(STREAM_START_TIME); // Seconds the stream active
+    const streamElapsed = executedBlockTimestamp.sub(STREAM_START_TIME); // Seconds the stream was active
     const expectedRecipientPaid = streamElapsed.mul(FUNDING_RATE_PER_SECOND); // Recipient is paid for every second the stream was active
     const expectedSenderRefund = EthersBN.from(FUNDING_AMOUNT).sub(expectedRecipientPaid); // Remainder sent back to sender
 
