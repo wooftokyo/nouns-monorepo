@@ -164,12 +164,16 @@ export const useTokenOwnerDataByBlock = (): TokenOwnershipsByBlock => {
   const formattedDelegateLogs: DelegateChangedLog[] | undefined = useDelegateChangedLogs();
 
   return useMemo(() => {
-    if (!formattedTransferLogs || formattedTransferLogs.length == 0 || !formattedDelegateLogs)
-      return {};
+    if (!formattedTransferLogs) return {};
 
-    const logs = [...formattedTransferLogs, ...formattedDelegateLogs].sort(
-      (a, b) => Number(a.blockNumber) - Number(b.blockNumber),
-    );
+    let logs: (TransferLog | DelegateChangedLog)[] = formattedTransferLogs;
+
+    // Merge in DelegateChanged events if present
+    if (formattedDelegateLogs) {
+      logs = [...logs, ...formattedDelegateLogs].sort(
+        (a, b) => Number(a.blockNumber) - Number(b.blockNumber),
+      );
+    }
 
     const blocks: TokenOwnershipsByBlock = {};
 
