@@ -1,4 +1,4 @@
-import { NounsDAOABI, NounsDaoLogicV1Factory } from '@nouns/sdk';
+import { NounsDAOABI, NounsDaoLogicV2Factory } from '@nouns/sdk';
 import { useContractCall, useContractCalls, useContractFunction, useEthers } from '@usedapp/core';
 import { utils, BigNumber as EthersBN } from 'ethers';
 import { defaultAbiCoder } from 'ethers/lib/utils';
@@ -40,6 +40,8 @@ interface ProposalCallResult {
   proposalThreshold: EthersBN;
   proposer: string;
   quorumVotes: EthersBN;
+  totalSupply: EthersBN;
+  creationBlock: EthersBN;
 }
 
 interface ProposalDetail {
@@ -66,6 +68,8 @@ export interface Proposal {
   quorumVotes: number;
   details: ProposalDetail[];
   transactionHash: string;
+  totalSupply: number;
+  creationBlock: number;
 }
 
 interface ProposalData {
@@ -81,7 +85,8 @@ export interface ProposalTransaction {
 }
 
 const abi = new utils.Interface(NounsDAOABI);
-const nounsDaoContract = new NounsDaoLogicV1Factory().attach(config.addresses.nounsDAOProxy);
+let nounsDaoContract = new NounsDaoLogicV2Factory().attach(config.addresses.nounsDAOProxy);
+
 const proposalCreatedFilter = nounsDaoContract.filters?.ProposalCreated(
   null,
   null,
@@ -212,14 +217,20 @@ export const useAllProposals = (): ProposalData => {
     return countToIndices(proposalCount);
   }, [proposalCount]);
 
-  const proposals = useContractCalls<ProposalCallResult>(
+  // TODO: upgrade useDapp, since it's likely causing this bug
+  // V2's proposals function now returns a struct, and while a regular
+  // ethers call returns as expected, this call returns an extra layer
+  // of array nesting.
+  const proposals = useContractCalls<ProposalCallResult[]>(
     govProposalIndexes.map(index => ({
       abi,
       address: nounsDaoContract.address,
       method: 'proposals',
       args: [index],
     })),
-  );
+  ).map(propArray => {
+    return propArray ? propArray[0] : undefined;
+  });
 
   const proposalStates = useContractCalls<[ProposalState]>(
     govProposalIndexes.map(index => ({
@@ -291,6 +302,8 @@ export const useAllProposals = (): ProposalData => {
           eta: proposal?.eta ? new Date(proposal?.eta?.toNumber() * 1000) : undefined,
           details: logs[i]?.details,
           transactionHash: logs[i]?.transactionHash,
+          totalSupply: parseInt(proposal?.totalSupply?.toString() ?? '0'),
+          creationBlock: parseInt(proposal?.creationBlock?.toString() ?? '0'),
         };
       }),
       loading: false,
