@@ -107,13 +107,20 @@ contract NounsDAOEvents {
 }
 
 contract NounsDAOEventsV2 is NounsDAOEvents {
-    /// @notice Emitted when dynamic quorum params are set
-    event DynamicQuorumParamsSet(
-        uint16 minQuorumVotesBPS,
-        uint16 maxQuorumVotesBPS,
-        uint16 quorumVotesBPSOffset,
-        uint32[2] quorumPolynomCoefs
-    );
+    /// @notice Emitted when minQuorumVotesBPS is set
+    event MinQuorumVotesBPSSet(uint16 oldMinQuorumVotesBPS, uint16 newMinQuorumVotesBPS);
+
+    /// @notice Emitted when maxQuorumVotesBPS is set
+    event MaxQuorumVotesBPSSet(uint16 oldMaxQuorumVotesBPS, uint16 newMaxQuorumVotesBPS);
+
+    /// @notice Emitted when quorumVotesBPSOffset is set
+    event QuorumVotesBPSOffsetSet(uint16 oldQuorumVotesBPSOffset, uint16 newQuorumVotesBPSOffset);
+
+    /// @notice Emitted when quorumLinearCoefficient is set
+    event QuorumLinearCoefficientSet(uint32 oldQuorumLinearCoefficient, uint32 newQuorumLinearCoefficient);
+
+    /// @notice Emitted when quorumQuadraticCoefficient is set
+    event QuorumQuadraticCoefficientSet(uint32 oldQuorumQuadraticCoefficient, uint32 newQuorumQuadraticCoefficient);
 }
 
 contract NounsDAOProxyStorage {
@@ -228,10 +235,7 @@ contract NounsDAOStorageV1 is NounsDAOProxyStorage {
 }
 
 /**
- * @title Naming adjustments to NounsDAOStorageV1 and added fields to `Proposal`
- * @notice This contract adjusts the following V1 storage key names for use in V2.
- * - `quorumVotesBPS` has been renamed to `minQuorumVotesBPS`.
- * - `Proposal.quorumVotes` has been renamed to `Proposal.minQuorumVotes`.
+ * @title Extra fields added to the `Proposal` struct from NounsDAOStorageV1
  * @notice The following fields were added to the `Proposal` struct:
  * - `Proposal.totalSupply`
  * - `Proposal.creationBlock`
@@ -249,8 +253,8 @@ contract NounsDAOStorageV1Adjusted is NounsDAOProxyStorage {
     /// @notice The basis point number of votes required in order for a voter to become a proposer. *DIFFERS from GovernerBravo
     uint256 public proposalThresholdBPS;
 
-    /// @notice The minimum basis point number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed. *DIFFERS from GovernerBravo
-    uint256 public minQuorumVotesBPS;
+    /// @notice The basis point number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed. *DIFFERS from GovernerBravo
+    uint256 public quorumVotesBPS;
 
     /// @notice The total number of proposals
     uint256 public proposalCount;
@@ -274,8 +278,8 @@ contract NounsDAOStorageV1Adjusted is NounsDAOProxyStorage {
         address proposer;
         /// @notice The number of votes needed to create a proposal at the time of proposal creation. *DIFFERS from GovernerBravo
         uint256 proposalThreshold;
-        /// @notice The minimum number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed at the time of proposal creation. *DIFFERS from GovernerBravo
-        uint256 minQuorumVotes;
+        /// @notice The number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed at the time of proposal creation. *DIFFERS from GovernerBravo
+        uint256 quorumVotes;
         /// @notice The timestamp that the proposal will be available for execution, set once the vote succeeds
         uint256 eta;
         /// @notice the ordered list of target addresses for calls to be made
@@ -344,15 +348,18 @@ contract NounsDAOStorageV2 is NounsDAOStorageV1Adjusted {
     DynamicQuorumParamsCheckpoint[] public quorumParamsCheckpoints;
 
     struct DynamicQuorumParams {
-        /// @notice Minimum quorum votes BPS at the time of proposal creation
+        /// @notice The minimum basis point number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed.
         uint16 minQuorumVotesBPS;
-        /// @notice The maximum basis point number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed. *DIFFERS from GovernerBravo
+        /// @notice The maximum basis point number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed.
         uint16 maxQuorumVotesBPS;
         /// @notice The quorum votes polynom input offset which suppresses polynom contribution until againstVotes.div(totalSupply) reaches this value
         uint16 quorumVotesBPSOffset;
-        /// @notice Polynomial coefficients for calculating a dynamic quorum based on the amount of against votes
-        /// @dev The coefficients are assumed to be fixed point integer with 6 decimals, i.e 0.2 is represented as 0.2 * 1e6 = 200000. There are 2 coefficients: x^1 and x^2
-        uint32[2] quorumPolynomCoefs;
+        /// @notice The linear component coefficient (x^1) for the dynamic quorum polynomial
+        /// @dev The coefficients are assumed to be fixed point integer with 6 decimals, i.e 0.2 is represented as 0.2 * 1e6 = 200000
+        uint32 quorumLinearCoefficient;
+        /// @notice The quadratic component coefficient (x^2) for the dynamic quorum polynomial
+        /// @dev The coefficients are assumed to be fixed point integer with 6 decimals, i.e 0.2 is represented as 0.2 * 1e6 = 200000
+        uint32 quorumQuadraticCoefficient;
     }
 
     /// @notice A checkpoint for storing dynamic quorum params from a given block

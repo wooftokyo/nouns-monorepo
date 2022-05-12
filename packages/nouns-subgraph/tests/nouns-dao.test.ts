@@ -2,17 +2,32 @@ import { assert, clearStore, test } from 'matchstick-as/assembly/index';
 import { Address, BigInt, Bytes, ByteArray } from '@graphprotocol/graph-ts';
 import { Proposal } from '../src/types/schema';
 import {
-  handleDynamicQuorumParamsSet,
   handleProposalCreatedWithRequirements,
   handleVoteCast,
+  handleMinQuorumVotesBPSSet,
+  handleMaxQuorumVotesBPSSet,
+  handleQuorumVotesBPSOffsetSet,
+  handleQuorumLinearCoefficientSet,
+  handleQuorumQuadraticCoefficientSet,
 } from '../src/nouns-dao';
 import {
-  createDynamicQuorumParamsSetEvent,
   createProposalCreatedWithRequirementsEvent,
   createVoteCastEvent,
   stubProposalCreatedWithRequirementsEventInput,
+  createMinQuorumVotesBPSSetEvent,
+  createMaxQuorumVotesBPSSetEvent,
+  createQuorumVotesBPSOffsetSetEvent,
+  createQuorumLinearCoefficientSetEvent,
+  createQuorumQuadraticCoefficientSetEvent,
+  handleAllQuorumParamEvents,
 } from './utils';
-import { BIGINT_ONE, BIGINT_ZERO, STATUS_ACTIVE, STATUS_PENDING } from '../src/utils/constants';
+import {
+  BIGINT_10K,
+  BIGINT_ONE,
+  BIGINT_ZERO,
+  STATUS_ACTIVE,
+  STATUS_PENDING,
+} from '../src/utils/constants';
 import {
   getOrCreateDynamicQuorumParams,
   getGovernanceEntity,
@@ -142,48 +157,6 @@ test('handleProposalCreatedWithRequirements: sets againstVotes to zero and total
   clearStore();
 });
 
-test('handleDynamicQuorumParamsSet: saves incoming values for the first time', () => {
-  const coefs = [BigInt.fromI32(1), BigInt.fromI32(2)];
-  const newEvent = createDynamicQuorumParamsSetEvent(500, 2000, 700, coefs);
-
-  handleDynamicQuorumParamsSet(newEvent);
-
-  const savedParams = getOrCreateDynamicQuorumParams();
-
-  assert.i32Equals(savedParams.minQuorumVotesBPS, 500);
-  assert.i32Equals(savedParams.maxQuorumVotesBPS, 2000);
-  assert.i32Equals(savedParams.quorumVotesBPSOffset, 700);
-
-  // have to do this cast due to compliation issues when trying to use the value directly
-  const savedCoefs = savedParams.quorumPolynomCoefs as Array<BigInt>;
-  assert.bigIntEquals(savedCoefs[0], coefs[0]);
-  assert.bigIntEquals(savedCoefs[1], coefs[1]);
-
-  clearStore();
-});
-
-test('handleDynamicQuorumParamsSet: saves incoming values on top of previous values', () => {
-  let coefs = [BigInt.fromI32(1), BigInt.fromI32(2)];
-  const firstEvent = createDynamicQuorumParamsSetEvent(500, 2000, 700, coefs);
-  handleDynamicQuorumParamsSet(firstEvent);
-
-  coefs = [BigInt.fromI32(3), BigInt.fromI32(4)];
-  const secondEvent = createDynamicQuorumParamsSetEvent(555, 2222, 777, coefs);
-  handleDynamicQuorumParamsSet(secondEvent);
-
-  const savedParams = getOrCreateDynamicQuorumParams();
-
-  assert.i32Equals(savedParams.minQuorumVotesBPS, 555);
-  assert.i32Equals(savedParams.maxQuorumVotesBPS, 2222);
-  assert.i32Equals(savedParams.quorumVotesBPSOffset, 777);
-
-  const savedCoefs = savedParams.quorumPolynomCoefs as Array<BigInt>;
-  assert.bigIntEquals(savedCoefs[0], coefs[0]);
-  assert.bigIntEquals(savedCoefs[1], coefs[1]);
-
-  clearStore();
-});
-
 test('handleVoteCast: updates quorumVotes using dynamic quorum math', () => {
   getOrCreateDelegate(SOME_ADDRESS);
   const totalSupply = BigInt.fromI32(200);
@@ -194,9 +167,9 @@ test('handleVoteCast: updates quorumVotes using dynamic quorum math', () => {
   governance.save();
 
   // Save dynamic quorum params
-  const coefs = [BigInt.fromI32(300000), BigInt.fromI32(1000)];
-  const quorumParamsEvent = createDynamicQuorumParamsSetEvent(1000, 4000, 500, coefs);
-  handleDynamicQuorumParamsSet(quorumParamsEvent);
+  const linearCoefficient = BigInt.fromI32(300000);
+  const quadraticCoefficient = BigInt.fromI32(1000);
+  handleAllQuorumParamEvents(1000, 4000, 500, linearCoefficient, quadraticCoefficient);
 
   // Create prop with state we need for quorum inputs
   const propEventInput = stubProposalCreatedWithRequirementsEventInput();
@@ -229,9 +202,9 @@ test('handleVoteCast: uses quorum params from prop creation time, not newer para
   governance.save();
 
   // Save dynamic quorum params
-  const coefs = [BigInt.fromI32(300000), BigInt.fromI32(1000)];
-  const quorumParamsEvent = createDynamicQuorumParamsSetEvent(1000, 4000, 500, coefs);
-  handleDynamicQuorumParamsSet(quorumParamsEvent);
+  const linearCoefficient = BigInt.fromI32(300000);
+  const quadraticCoefficient = BigInt.fromI32(1000);
+  handleAllQuorumParamEvents(1000, 4000, 500, linearCoefficient, quadraticCoefficient);
 
   // Create prop with state we need for quorum inputs
   const propEventInput = stubProposalCreatedWithRequirementsEventInput();
@@ -240,9 +213,9 @@ test('handleVoteCast: uses quorum params from prop creation time, not newer para
   handleProposalCreatedWithRequirements(newPropEvent);
 
   // Update dynamic quorum params
-  const higherCoefs = [BigInt.fromI32(600000), BigInt.fromI32(20000)];
-  const higherQuorumParamsEvent = createDynamicQuorumParamsSetEvent(500, 6000, 0, higherCoefs);
-  handleDynamicQuorumParamsSet(higherQuorumParamsEvent);
+  const greaterLinearCoefficient = BigInt.fromI32(600000);
+  const greaterQuadraticCoefficient = BigInt.fromI32(20000);
+  handleAllQuorumParamEvents(500, 6000, 0, greaterLinearCoefficient, greaterQuadraticCoefficient);
 
   const voter = Address.fromString(SOME_ADDRESS);
   const propId = BIGINT_ONE;
@@ -255,6 +228,66 @@ test('handleVoteCast: uses quorum params from prop creation time, not newer para
   const savedProp = Proposal.load(propId.toString());
 
   assert.bigIntEquals(BigInt.fromI32(80), savedProp!.quorumVotes);
+
+  clearStore();
+});
+
+test('handleMinQuorumVotesBPSSet: saves incoming values', () => {
+  const event1 = createMinQuorumVotesBPSSetEvent(0, 1);
+  handleMinQuorumVotesBPSSet(event1);
+  assert.i32Equals(1, getOrCreateDynamicQuorumParams().minQuorumVotesBPS);
+
+  const event2 = createMinQuorumVotesBPSSetEvent(1, 2);
+  handleMinQuorumVotesBPSSet(event2);
+  assert.i32Equals(2, getOrCreateDynamicQuorumParams().minQuorumVotesBPS);
+
+  clearStore();
+});
+
+test('handleMaxQuorumVotesBPSSet: saves incoming values', () => {
+  const event1 = createMaxQuorumVotesBPSSetEvent(0, 1000);
+  handleMaxQuorumVotesBPSSet(event1);
+  assert.i32Equals(1000, getOrCreateDynamicQuorumParams().maxQuorumVotesBPS);
+
+  const event2 = createMaxQuorumVotesBPSSetEvent(1000, 2000);
+  handleMaxQuorumVotesBPSSet(event2);
+  assert.i32Equals(2000, getOrCreateDynamicQuorumParams().maxQuorumVotesBPS);
+
+  clearStore();
+});
+
+test('handleQuorumVotesBPSOffsetSet: saves incoming values', () => {
+  const event1 = createQuorumVotesBPSOffsetSetEvent(0, 100);
+  handleQuorumVotesBPSOffsetSet(event1);
+  assert.i32Equals(100, getOrCreateDynamicQuorumParams().quorumVotesBPSOffset);
+
+  const event2 = createQuorumVotesBPSOffsetSetEvent(100, 200);
+  handleQuorumVotesBPSOffsetSet(event2);
+  assert.i32Equals(200, getOrCreateDynamicQuorumParams().quorumVotesBPSOffset);
+
+  clearStore();
+});
+
+test('handleQuorumLinearCoefficientSet: saves incoming values', () => {
+  const event1 = createQuorumLinearCoefficientSetEvent(BIGINT_ZERO, BIGINT_ONE);
+  handleQuorumLinearCoefficientSet(event1);
+  assert.bigIntEquals(BIGINT_ONE, getOrCreateDynamicQuorumParams().quorumLinearCoefficient);
+
+  const event2 = createQuorumLinearCoefficientSetEvent(BIGINT_ONE, BIGINT_10K);
+  handleQuorumLinearCoefficientSet(event2);
+  assert.bigIntEquals(BIGINT_10K, getOrCreateDynamicQuorumParams().quorumLinearCoefficient);
+
+  clearStore();
+});
+
+test('handleQuorumQuadraticCoefficientSet: saves incoming values', () => {
+  const event1 = createQuorumQuadraticCoefficientSetEvent(BIGINT_ZERO, BIGINT_ONE);
+  handleQuorumQuadraticCoefficientSet(event1);
+  assert.bigIntEquals(BIGINT_ONE, getOrCreateDynamicQuorumParams().quorumQuadraticCoefficient);
+
+  const event2 = createQuorumQuadraticCoefficientSetEvent(BIGINT_ONE, BIGINT_10K);
+  handleQuorumQuadraticCoefficientSet(event2);
+  assert.bigIntEquals(BIGINT_10K, getOrCreateDynamicQuorumParams().quorumQuadraticCoefficient);
 
   clearStore();
 });

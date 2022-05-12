@@ -91,7 +91,7 @@ export function getOrCreateProposal(
 
     let governance = getGovernanceEntity();
 
-    governance.proposals = governance.proposals + BIGINT_ONE;
+    governance.proposals = governance.proposals.plus(BIGINT_ONE);
     governance.save();
 
     if (save) {
@@ -128,7 +128,8 @@ export function getOrCreateDynamicQuorumParams(): DynamicQuorumParams {
     params.minQuorumVotesBPS = 0;
     params.maxQuorumVotesBPS = 0;
     params.quorumVotesBPSOffset = 0;
-    params.quorumPolynomCoefs = [BIGINT_ZERO, BIGINT_ZERO];
+    params.quorumLinearCoefficient = BIGINT_ZERO;
+    params.quorumQuadraticCoefficient = BIGINT_ZERO;
 
     params.save();
   }

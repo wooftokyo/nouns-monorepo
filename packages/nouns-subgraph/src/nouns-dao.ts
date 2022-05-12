@@ -6,7 +6,11 @@ import {
   ProposalExecuted,
   VoteCast,
   ProposalVetoed,
-  DynamicQuorumParamsSet,
+  MinQuorumVotesBPSSet,
+  MaxQuorumVotesBPSSet,
+  QuorumVotesBPSOffsetSet,
+  QuorumLinearCoefficientSet,
+  QuorumQuadraticCoefficientSet,
 } from './types/NounsDAO/NounsDAO';
 import {
   getOrCreateDelegate,
@@ -27,7 +31,6 @@ import {
   BIGINT_ZERO,
 } from './utils/constants';
 import { dynamicQuorumVotes } from './utils/dynamicQuorum';
-import { DynamicQuorumParams } from './types/schema';
 
 export function handleProposalCreatedWithRequirements(
   event: ProposalCreatedWithRequirements,
@@ -69,7 +72,8 @@ export function handleProposalCreatedWithRequirements(
   proposal.minQuorumVotesBPS = dynamicQuorum.minQuorumVotesBPS;
   proposal.maxQuorumVotesBPS = dynamicQuorum.maxQuorumVotesBPS;
   proposal.quorumVotesBPSOffset = dynamicQuorum.quorumVotesBPSOffset;
-  proposal.quorumPolynomCoefs = dynamicQuorum.quorumPolynomCoefs;
+  proposal.quorumLinearCoefficient = dynamicQuorum.quorumLinearCoefficient;
+  proposal.quorumQuadraticCoefficient = dynamicQuorum.quorumQuadraticCoefficient;
 
   proposal.save();
 }
@@ -149,7 +153,7 @@ export function handleVoteCast(event: VoteCast): void {
 
   let shouldSaveProp = false;
 
-  if (vote.support == 0) {
+  if (event.params.support == 0) {
     shouldSaveProp = true;
     proposal.againstVotes = proposal.againstVotes + event.params.votes.toI32();
   }
@@ -163,7 +167,8 @@ export function handleVoteCast(event: VoteCast): void {
       proposal.minQuorumVotesBPS,
       proposal.maxQuorumVotesBPS,
       proposal.quorumVotesBPSOffset,
-      proposal.quorumPolynomCoefs as Array<BigInt>,
+      proposal.quorumLinearCoefficient,
+      proposal.quorumQuadraticCoefficient,
     );
   }
 
@@ -177,13 +182,32 @@ export function handleVoteCast(event: VoteCast): void {
   }
 }
 
-export function handleDynamicQuorumParamsSet(event: DynamicQuorumParamsSet): void {
+export function handleMinQuorumVotesBPSSet(event: MinQuorumVotesBPSSet): void {
   const params = getOrCreateDynamicQuorumParams();
+  params.minQuorumVotesBPS = event.params.newMinQuorumVotesBPS;
+  params.save();
+}
 
-  params.minQuorumVotesBPS = event.params.minQuorumVotesBPS;
-  params.maxQuorumVotesBPS = event.params.maxQuorumVotesBPS;
-  params.quorumVotesBPSOffset = event.params.quorumVotesBPSOffset;
-  params.quorumPolynomCoefs = event.params.quorumPolynomCoefs;
+export function handleMaxQuorumVotesBPSSet(event: MaxQuorumVotesBPSSet): void {
+  const params = getOrCreateDynamicQuorumParams();
+  params.maxQuorumVotesBPS = event.params.newMaxQuorumVotesBPS;
+  params.save();
+}
 
+export function handleQuorumVotesBPSOffsetSet(event: QuorumVotesBPSOffsetSet): void {
+  const params = getOrCreateDynamicQuorumParams();
+  params.quorumVotesBPSOffset = event.params.newQuorumVotesBPSOffset;
+  params.save();
+}
+
+export function handleQuorumLinearCoefficientSet(event: QuorumLinearCoefficientSet): void {
+  const params = getOrCreateDynamicQuorumParams();
+  params.quorumLinearCoefficient = event.params.newQuorumLinearCoefficient;
+  params.save();
+}
+
+export function handleQuorumQuadraticCoefficientSet(event: QuorumQuadraticCoefficientSet): void {
+  const params = getOrCreateDynamicQuorumParams();
+  params.quorumQuadraticCoefficient = event.params.newQuorumQuadraticCoefficient;
   params.save();
 }

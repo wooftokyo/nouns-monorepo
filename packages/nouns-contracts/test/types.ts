@@ -9,5 +9,6 @@ export type DynamicQuorumParams = {
   minQuorumVotesBPS: BigNumberish;
   maxQuorumVotesBPS: BigNumberish;
   quorumVotesBPSOffset: BigNumberish;
-  quorumPolynomCoefs: [BigNumberish, BigNumberish];
+  quorumLinearCoefficient: BigNumberish;
+  quorumQuadraticCoefficient: BigNumberish;
 };

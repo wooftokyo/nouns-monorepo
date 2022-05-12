@@ -1,11 +1,22 @@
 import { newMockEvent } from 'matchstick-as/assembly/index';
 import {
-  DynamicQuorumParamsSet,
   ProposalCreatedWithRequirements,
   VoteCast,
+  MinQuorumVotesBPSSet,
+  MaxQuorumVotesBPSSet,
+  QuorumVotesBPSOffsetSet,
+  QuorumLinearCoefficientSet,
+  QuorumQuadraticCoefficientSet,
 } from '../src/types/NounsDAO/NounsDAO';
+import {
+  handleMinQuorumVotesBPSSet,
+  handleMaxQuorumVotesBPSSet,
+  handleQuorumVotesBPSOffsetSet,
+  handleQuorumLinearCoefficientSet,
+  handleQuorumQuadraticCoefficientSet,
+} from '../src/nouns-dao';
 import { Address, ethereum, Bytes, BigInt, ByteArray } from '@graphprotocol/graph-ts';
-import { BIGINT_ONE } from '../src/utils/constants';
+import { BIGINT_ONE, BIGINT_ZERO } from '../src/utils/constants';
 
 export class ProposalCreatedWithRequirementsEvent {
   id: BigInt;
@@ -71,37 +82,6 @@ export function createProposalCreatedWithRequirementsEvent(
   return newEvent;
 }
 
-export function createDynamicQuorumParamsSetEvent(
-  minQuorumVotesBPS: i32,
-  maxQuorumVotesBPS: i32,
-  quorumVotesBPSOffset: i32,
-  quorumPolynomCoefs: Array<BigInt>,
-): DynamicQuorumParamsSet {
-  let newEvent = changetype<DynamicQuorumParamsSet>(newMockEvent());
-  newEvent.parameters = new Array();
-
-  newEvent.parameters.push(
-    new ethereum.EventParam('minQuorumVotesBPS', ethereum.Value.fromI32(minQuorumVotesBPS)),
-  );
-
-  newEvent.parameters.push(
-    new ethereum.EventParam('maxQuorumVotesBPS', ethereum.Value.fromI32(maxQuorumVotesBPS)),
-  );
-
-  newEvent.parameters.push(
-    new ethereum.EventParam('quorumVotesBPSOffset', ethereum.Value.fromI32(quorumVotesBPSOffset)),
-  );
-
-  newEvent.parameters.push(
-    new ethereum.EventParam(
-      'quorumPolynomCoefs',
-      ethereum.Value.fromUnsignedBigIntArray(quorumPolynomCoefs),
-    ),
-  );
-
-  return newEvent;
-}
-
 export function stubProposalCreatedWithRequirementsEventInput(): ProposalCreatedWithRequirementsEvent {
   return {
     id: BigInt.fromI32(1),
@@ -141,4 +121,130 @@ export function createVoteCastEvent(
   );
 
   return newEvent;
+}
+
+export function createMinQuorumVotesBPSSetEvent(
+  oldMinQuorumVotesBPS: i32,
+  newMinQuorumVotesBPS: i32,
+): MinQuorumVotesBPSSet {
+  let newEvent = changetype<MinQuorumVotesBPSSet>(newMockEvent());
+  newEvent.parameters = new Array();
+
+  newEvent.parameters.push(
+    new ethereum.EventParam('oldMinQuorumVotesBPS', ethereum.Value.fromI32(oldMinQuorumVotesBPS)),
+  );
+
+  newEvent.parameters.push(
+    new ethereum.EventParam('newMinQuorumVotesBPS', ethereum.Value.fromI32(newMinQuorumVotesBPS)),
+  );
+
+  return newEvent;
+}
+
+export function createMaxQuorumVotesBPSSetEvent(
+  oldMaxQuorumVotesBPS: i32,
+  newMaxQuorumVotesBPS: i32,
+): MaxQuorumVotesBPSSet {
+  let newEvent = changetype<MaxQuorumVotesBPSSet>(newMockEvent());
+  newEvent.parameters = new Array();
+
+  newEvent.parameters.push(
+    new ethereum.EventParam('oldMaxQuorumVotesBPS', ethereum.Value.fromI32(oldMaxQuorumVotesBPS)),
+  );
+
+  newEvent.parameters.push(
+    new ethereum.EventParam('newMaxQuorumVotesBPS', ethereum.Value.fromI32(newMaxQuorumVotesBPS)),
+  );
+
+  return newEvent;
+}
+
+export function createQuorumVotesBPSOffsetSetEvent(
+  oldQuorumVotesBPSOffset: i32,
+  newQuorumVotesBPSOffset: i32,
+): QuorumVotesBPSOffsetSet {
+  let newEvent = changetype<QuorumVotesBPSOffsetSet>(newMockEvent());
+  newEvent.parameters = new Array();
+
+  newEvent.parameters.push(
+    new ethereum.EventParam(
+      'oldQuorumVotesBPSOffset',
+      ethereum.Value.fromI32(oldQuorumVotesBPSOffset),
+    ),
+  );
+
+  newEvent.parameters.push(
+    new ethereum.EventParam(
+      'newQuorumVotesBPSOffset',
+      ethereum.Value.fromI32(newQuorumVotesBPSOffset),
+    ),
+  );
+
+  return newEvent;
+}
+
+export function createQuorumLinearCoefficientSetEvent(
+  oldQuorumLinearCoefficient: BigInt,
+  newQuorumLinearCoefficient: BigInt,
+): QuorumLinearCoefficientSet {
+  let newEvent = changetype<QuorumLinearCoefficientSet>(newMockEvent());
+  newEvent.parameters = new Array();
+
+  newEvent.parameters.push(
+    new ethereum.EventParam(
+      'oldQuorumLinearCoefficient',
+      ethereum.Value.fromUnsignedBigInt(oldQuorumLinearCoefficient),
+    ),
+  );
+
+  newEvent.parameters.push(
+    new ethereum.EventParam(
+      'newQuorumLinearCoefficient',
+      ethereum.Value.fromUnsignedBigInt(newQuorumLinearCoefficient),
+    ),
+  );
+
+  return newEvent;
+}
+
+export function createQuorumQuadraticCoefficientSetEvent(
+  oldQuorumQuadraticCoefficient: BigInt,
+  newQuorumQuadraticCoefficient: BigInt,
+): QuorumQuadraticCoefficientSet {
+  let newEvent = changetype<QuorumQuadraticCoefficientSet>(newMockEvent());
+  newEvent.parameters = new Array();
+
+  newEvent.parameters.push(
+    new ethereum.EventParam(
+      'oldQuorumQuadraticCoefficient',
+      ethereum.Value.fromUnsignedBigInt(oldQuorumQuadraticCoefficient),
+    ),
+  );
+
+  newEvent.parameters.push(
+    new ethereum.EventParam(
+      'newQuorumQuadraticCoefficient',
+      ethereum.Value.fromUnsignedBigInt(newQuorumQuadraticCoefficient),
+    ),
+  );
+
+  return newEvent;
+}
+
+export function handleAllQuorumParamEvents(
+  newMinQuorumVotesBPS: i32,
+  newMaxQuorumVotesBPS: i32,
+  newQuorumVotesBPSOffset: i32,
+  newLinearCoefficient: BigInt,
+  newQuadraticCoefficient: BigInt,
+): void {
+  handleMinQuorumVotesBPSSet(createMinQuorumVotesBPSSetEvent(0, newMinQuorumVotesBPS));
+  handleMaxQuorumVotesBPSSet(createMaxQuorumVotesBPSSetEvent(0, newMaxQuorumVotesBPS));
+  handleQuorumVotesBPSOffsetSet(createQuorumVotesBPSOffsetSetEvent(0, newQuorumVotesBPSOffset));
+  handleQuorumLinearCoefficientSet(
+    createQuorumLinearCoefficientSetEvent(BIGINT_ZERO, newLinearCoefficient),
+  );
+  handleQuorumQuadraticCoefficientSet(
+    createQuorumQuadraticCoefficientSetEvent(BIGINT_ZERO, newQuadraticCoefficient),
+  );
 }
