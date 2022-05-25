@@ -41,7 +41,7 @@ abstract contract ERC721Checkpointable is ERC721Enumerable {
     uint8 public constant decimals = 0;
 
     /// @notice A record of each accounts delegate
-    mapping(address => address) private _delegates;
+    mapping(address => mapping(uint256 => address)) private _delegates;
 
     /// @notice A checkpoint for marking number of votes from a given block
     struct Checkpoint {
@@ -67,7 +67,7 @@ abstract contract ERC721Checkpointable is ERC721Enumerable {
     mapping(address => uint256) public nonces;
 
     /// @notice An event thats emitted when an account changes its delegate
-    event DelegateChanged(address indexed delegator, address indexed fromDelegate, address indexed toDelegate);
+    event DelegateChanged(address indexed delegator, address indexed fromDelegate, address indexed toDelegate, uint256 tokenId);
 
     /// @notice An event thats emitted when a delegate account's vote balance changes
     event DelegateVotesChanged(address indexed delegate, uint256 previousBalance, uint256 newBalance);
@@ -85,8 +85,8 @@ abstract contract ERC721Checkpointable is ERC721Enumerable {
      * the delegator's own address if they haven't delegated.
      * This avoids having to delegate to oneself.
      */
-    function delegates(address delegator) public view returns (address) {
-        address current = _delegates[delegator];
+    function delegates(address delegator, uint256 tokenId) public view returns (address) {
+        address current = _delegates[delegator][tokenId];
         return current == address(0) ? delegator : current;
     }
 
@@ -102,16 +102,16 @@ abstract contract ERC721Checkpointable is ERC721Enumerable {
         super._beforeTokenTransfer(from, to, tokenId);
 
         /// @notice Differs from `_transferTokens()` to use `delegates` override method to simulate auto-delegation
-        _moveDelegates(delegates(from), delegates(to), 1);
+        _moveDelegates(delegates(from, tokenId), delegates(to, tokenId), 1);
     }
 
     /**
      * @notice Delegate votes from `msg.sender` to `delegatee`
      * @param delegatee The address to delegate votes to
      */
-    function delegate(address delegatee) public {
+    function delegate(address delegatee, uint256 tokenId) public {
         if (delegatee == address(0)) delegatee = msg.sender;
-        return _delegate(msg.sender, delegatee);
+        return _delegate(msg.sender, delegatee, tokenId);
     }
 
     /**
@@ -125,6 +125,7 @@ abstract contract ERC721Checkpointable is ERC721Enumerable {
      */
     function delegateBySig(
         address delegatee,
+        uint256 tokenId,
         uint256 nonce,
         uint256 expiry,
         uint8 v,
@@ -140,7 +141,7 @@ abstract contract ERC721Checkpointable is ERC721Enumerable {
         require(signatory != address(0), 'ERC721Checkpointable::delegateBySig: invalid signature');
         require(nonce == nonces[signatory]++, 'ERC721Checkpointable::delegateBySig: invalid nonce');
         require(block.timestamp <= expiry, 'ERC721Checkpointable::delegateBySig: signature expired');
-        return _delegate(signatory, delegatee);
+        return _delegate(signatory, delegatee, tokenId);
     }
 
     /**
@@ -194,17 +195,15 @@ abstract contract ERC721Checkpointable is ERC721Enumerable {
         return checkpoints[account][lower].votes;
     }
 
-    function _delegate(address delegator, address delegatee) internal {
+    function _delegate(address delegator, address delegatee, uint256 tokenId) internal {
         /// @notice differs from `_delegate()` in `Comp.sol` to use `delegates` override method to simulate auto-delegation
-        address currentDelegate = delegates(delegator);
+        address currentDelegate = delegates(delegator, tokenId);
 
-        _delegates[delegator] = delegatee;
+        _delegates[delegator][tokenId] = delegatee;
 
-        emit DelegateChanged(delegator, currentDelegate, delegatee);
+        emit DelegateChanged(delegator, currentDelegate, delegatee, tokenId);
 
-        uint96 amount = votesToDelegate(delegator);
-
-        _moveDelegates(currentDelegate, delegatee, amount);
+        _moveDelegates(currentDelegate, delegatee, 1);
     }
 
     function _moveDelegates(
