@@ -50,6 +50,19 @@
   color: black;
 }
 
+.coolDark {
+  color: white;
+  background-color: var(--brand-cool-dark-text);
+  transition: all 125ms ease-in-out;
+  width: 100%;
+  margin-left: 1rem;
+}
+
+.coolDark:hover {
+  color: var(--brand-cool-dark-text);
+  background-color: white;
+}
+
 .coolWallet {
   background-color: var(--brand-cool-accent);
   border: 1px solid var(--brand-cool-border);
@@ -102,6 +115,18 @@
 .whiteWallet:hover {
   background-color: #e2e3e8;
   color: black;
+}
+
+.coolCloseDelegate {
+  background-color: white;
+  color: var(--brand-cool-dark-text);
+  border: 1px solid var(--brand-gray-border);
+  transition: all 125ms ease-in-out;
+}
+
+.coolCloseDelegate:hover {
+  background-color: var(--brand-cool-dark-text);
+  color: white;
 }
 
 .whiteActive {

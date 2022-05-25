@@ -9,6 +9,8 @@ export enum NavBarButtonStyle {
   WHITE_ACTIVE,
   WHITE_ACTIVE_VOTE_SUBMIT,
   WHITE_WALLET,
+  COOL_CHANGE_DELEGATE ,
+  COOL_CLOSE_DELEGATE
 }
 
 interface NavBarButtonProps {
@@ -24,6 +26,13 @@ export const getNavBarButtonVariant = (buttonStyle?: NavBarButtonStyle) => {
     }
     case NavBarButtonStyle.COOL_WALLET: {
       return classes.coolWallet;
+    }
+    case NavBarButtonStyle.COOL_CHANGE_DELEGATE: {
+      // TODO change this CSS classname
+      return classes.coolDark;
+    }
+    case NavBarButtonStyle.COOL_CLOSE_DELEGATE: {
+      return classes.coolCloseDelegate;
     }
     case NavBarButtonStyle.WARM_INFO: {
       return classes.warmInfo;

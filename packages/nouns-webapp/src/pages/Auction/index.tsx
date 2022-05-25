@@ -8,6 +8,7 @@ import { nounPath } from '../../utils/history';
 import useOnDisplayAuction from '../../wrappers/onDisplayAuction';
 import { useEffect } from 'react';
 import ProfileActivityFeed from '../../components/ProfileActivityFeed';
+import DelegationModal from '../../components/DelegationModal';
 
 interface AuctionPageProps {
   initialAuctionId?: number;
@@ -45,6 +46,7 @@ const AuctionPage: React.FC<AuctionPageProps> = props => {
 
   return (
     <>
+      <DelegationModal onDismiss={() => console.log("close")}/>
       <Auction auction={onDisplayAuction} />
       {onDisplayAuctionNounId !== undefined && onDisplayAuctionNounId !== lastAuctionNounId ? (
         <ProfileActivityFeed nounId={onDisplayAuctionNounId} />
