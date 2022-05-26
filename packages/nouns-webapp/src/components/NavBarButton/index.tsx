@@ -9,14 +9,15 @@ export enum NavBarButtonStyle {
   WHITE_ACTIVE,
   WHITE_ACTIVE_VOTE_SUBMIT,
   WHITE_WALLET,
-  COOL_CHANGE_DELEGATE ,
-  COOL_CLOSE_DELEGATE
+  COOL_CHANGE_DELEGATE,
+  COOL_CLOSE_DELEGATE,
 }
 
 interface NavBarButtonProps {
   buttonText: React.ReactNode;
   buttonIcon?: React.ReactNode;
   buttonStyle?: NavBarButtonStyle;
+  onClick?: (e: any) => any;
 }
 
 export const getNavBarButtonVariant = (buttonStyle?: NavBarButtonStyle) => {
@@ -59,11 +60,14 @@ export const getNavBarButtonVariant = (buttonStyle?: NavBarButtonStyle) => {
 };
 
 const NavBarButton: React.FC<NavBarButtonProps> = props => {
-  const { buttonText, buttonIcon, buttonStyle } = props;
+  const { buttonText, buttonIcon, buttonStyle, onClick } = props;
 
   return (
     <>
-      <div className={`${classes.wrapper} ${getNavBarButtonVariant(buttonStyle)}`}>
+      <div
+        className={`${classes.wrapper} ${getNavBarButtonVariant(buttonStyle)}`}
+        onClick={onClick}
+      >
         <div className={classes.button}>
           {buttonIcon && <div className={classes.icon}>{buttonIcon}</div>}
           <div>{buttonText}</div>
