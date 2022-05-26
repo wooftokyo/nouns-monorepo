@@ -34,7 +34,7 @@ import { IWETH } from './interfaces/IWETH.sol';
 
 contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, ReentrancyGuardUpgradeable, OwnableUpgradeable {
     // The window in which only authorized addresses can settle
-    uint256 constant WHITELISTED_SETTLEMENT_WINDOW = 5 minutes;
+    uint256 constant AUTHORIZED_SETTLEMENT_WINDOW = 5 minutes;
 
     // The Nouns ERC721 token contract
     INounsToken public nouns;
@@ -247,7 +247,7 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
         require(!_auction.settled, 'Auction has already been settled');
         require(block.timestamp >= _auction.endTime, "Auction hasn't completed");
         require(
-            block.timestamp - auction.endTime > WHITELISTED_SETTLEMENT_WINDOW || authorizedSettlers[msg.sender],
+            block.timestamp - auction.endTime > AUTHORIZED_SETTLEMENT_WINDOW || authorizedSettlers[msg.sender],
             'Settlement not available'
         );
 
