@@ -33,6 +33,9 @@ import { INounsToken } from './interfaces/INounsToken.sol';
 import { IWETH } from './interfaces/IWETH.sol';
 
 contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, ReentrancyGuardUpgradeable, OwnableUpgradeable {
+    // The window in which only authorized addresses can settle
+    uint256 constant WHITELISTED_SETTLEMENT_WINDOW = 5 minutes;
+
     // The Nouns ERC721 token contract
     INounsToken public nouns;
 
@@ -53,6 +56,9 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
 
     // The active auction
     INounsAuctionHouse.Auction public auction;
+
+    // Addresses that are able to settle before `WHITELISTED_SETTLEMENT_WINDOW` elapses
+    mapping(address => bool) public authorizedSettlers;
 
     /**
      * @notice Initialize the auction house and base contracts,
@@ -189,6 +195,22 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
     }
 
     /**
+     * @notice Add an authorized settler.
+     * @dev Only callable by the owner.
+     */
+    function addAuthorizedSettler(address settler) external onlyOwner {
+        authorizedSettlers[settler] = true;
+    }
+
+    /**
+     * @notice Remove an authorized settler.
+     * @dev Only callable by the owner.
+     */
+    function removeAuthorizedSettler(address settler) external onlyOwner {
+        authorizedSettlers[settler] = false;
+    }
+
+    /**
      * @notice Create an auction.
      * @dev Store the auction details in the `auction` state variable and emit an AuctionCreated event.
      * If the mint reverts, the minter was updated without pausing this contract first. To remedy this,
@@ -224,6 +246,10 @@ contract NounsAuctionHouse is INounsAuctionHouse, PausableUpgradeable, Reentranc
         require(_auction.startTime != 0, "Auction hasn't begun");
         require(!_auction.settled, 'Auction has already been settled');
         require(block.timestamp >= _auction.endTime, "Auction hasn't completed");
+        require(
+            block.timestamp - auction.endTime > WHITELISTED_SETTLEMENT_WINDOW || authorizedSettlers[msg.sender],
+            'Settlement not available'
+        );
 
         auction.settled = true;
 
