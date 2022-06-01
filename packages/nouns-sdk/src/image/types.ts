@@ -1,5 +1,10 @@
 export interface IEncoder {
-  encodeImage(filename: string, image: unknown): string;
+  encodeImage(filename: string, image: unknown): DeflateInfo;
+}
+
+export interface DeflateInfo {
+  length: number;
+  data: string;
 }
 
 export interface Rect {
@@ -41,7 +46,7 @@ export interface DecodedImage {
 
 export interface EncodedImage {
   filename: string;
-  data: string;
+  info: DeflateInfo;
 }
 
 export interface ImageData {

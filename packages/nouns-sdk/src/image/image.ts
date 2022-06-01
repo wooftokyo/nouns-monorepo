@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { ImageBounds, ImageRow, ImageRows, Rect, RGBAColor } from './types';
+import { DeflateInfo, ImageBounds, ImageRow, ImageRows, Rect, RGBAColor } from './types';
 import { rgbToHex, toPaddedHex } from './utils';
+import { deflateSync } from 'zlib';
 
 /**
  * A class used to convert an image into the following RLE format:
@@ -12,6 +13,7 @@ export class Image {
   private _rows: ImageRows = {};
   private _bounds: ImageBounds = { top: 0, bottom: 0, left: 0, right: 0 };
   private _rle: string | undefined;
+  private _compressed: DeflateInfo | undefined;
 
   /**
    * The image's pixel width
@@ -60,6 +62,28 @@ export class Image {
       this._rle = this.encode(getRgbaAt, colors);
     }
     return this._rle;
+  }
+
+  /**
+   * Convert an image to a DEFLATE-compressed, run-length encoded string using the provided RGBA
+   * and color palette values.
+   * @param getRgbaAt A function used to fetch the RGBA values at specific x-y coordinates
+   * @param colors The color palette map
+   */
+  public deflate(
+    getRgbaAt: (x: number, y: number) => RGBAColor,
+    colors: Map<string, number>,
+  ): DeflateInfo {
+    const rle = this.toRLE(getRgbaAt, colors);
+    if (!this._compressed) {
+      const buffer = Buffer.from(rle.replace('0x', ''), 'hex');
+      const data = deflateSync(buffer).toString('hex');
+      this._compressed = {
+        length: buffer.length,
+        data: `0x${data.substring(4, data.length - 8)}`, // Truncate header (first 2 bytes) and checksum (last 4 bytes).
+      };
+    }
+    return this._compressed;
   }
 
   /**

@@ -18,7 +18,25 @@
 pragma solidity ^0.8.12;
 
 interface INounsArt {
+    error SenderIsNotDescriptor();
+
+    error SenderIsNotPendingDescriptor();
+
+    error EmptyPalette();
+
+    error BadPaletteLength();
+
     event DescriptorUpdated(address oldDescriptor, address newDescriptor);
+
+    struct NounArt {
+        uint96 length;
+        bytes data;
+    }
+
+    struct NounArtPointer {
+        uint96 length;
+        address pointer;
+    }
 
     function descriptor() external view returns (address);
 
@@ -50,25 +68,25 @@ interface INounsArt {
 
     function glassesCount() external view returns (uint256);
 
-    function setPalette(uint8 paletteIndex, address palette) external;
+    function setPalette(uint8 paletteIndex, bytes calldata palette) external;
 
     function addManyBackgrounds(string[] calldata backgrounds) external;
 
-    function addManyBodies(bytes[] calldata bodies) external;
+    function addManyBodies(NounArt[] calldata bodies) external;
 
-    function addManyAccessories(bytes[] calldata accessories) external;
+    function addManyAccessories(NounArt[] calldata accessories) external;
 
-    function addManyHeads(bytes[] calldata heads) external;
+    function addManyHeads(NounArt[] calldata heads) external;
 
-    function addManyGlasses(bytes[] calldata glasses) external;
+    function addManyGlasses(NounArt[] calldata glasses) external;
 
     function addBackground(string calldata background) external;
 
-    function addBody(bytes calldata body) external;
+    function addBody(NounArt calldata body) external;
 
-    function addAccessory(bytes calldata accessory) external;
+    function addAccessory(NounArt calldata accessory) external;
 
-    function addHead(bytes calldata head) external;
+    function addHead(NounArt calldata head) external;
 
-    function addGlasses(bytes calldata glasses) external;
+    function addGlasses(NounArt calldata glasses) external;
 }

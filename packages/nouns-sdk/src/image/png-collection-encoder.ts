@@ -1,5 +1,5 @@
 import { promises as fs } from 'fs';
-import { EncodedImage, IEncoder, ImageData, PngImage } from './types';
+import { DeflateInfo, EncodedImage, IEncoder, ImageData, PngImage } from './types';
 import { Image } from './image';
 
 /**
@@ -9,7 +9,7 @@ import { Image } from './image';
 export class PNGCollectionEncoder implements IEncoder {
   private readonly _transparent: [string, number] = ['', 0];
   private _colors: Map<string, number> = new Map([this._transparent]);
-  private _images: Map<string, string> = new Map();
+  private _images: Map<string, DeflateInfo> = new Map();
   private _folders: { [name: string]: string[] } = {};
 
   constructor(colors?: string[]) {
@@ -32,22 +32,23 @@ export class PNGCollectionEncoder implements IEncoder {
   }
 
   /**
-   * Decode a PNG image and re-encode using a custom run-length encoding
-   * @param image The image name
+   * Decode a PNG image, re-encode using a custom run-length encoding, and compress
+   * using DEFLATE.
+   * @param name The image name
    * @param png The png image data
    * @param folder An optional containing folder name
    */
-  public encodeImage(name: string, png: PngImage, folder?: string): string {
+  public encodeImage(name: string, png: PngImage, folder?: string): DeflateInfo {
     const image = new Image(png.width, png.height);
-    const rle = image.toRLE((x, y) => png.rgbaAt(x, y), this._colors);
+    const compressed = image.deflate((x, y) => png.rgbaAt(x, y), this._colors);
 
-    this._images.set(name, rle);
+    this._images.set(name, compressed);
 
     if (folder) {
       (this._folders[folder] ||= []).push(name);
     }
 
-    return rle;
+    return compressed;
   }
 
   /**
@@ -75,7 +76,7 @@ export class PNGCollectionEncoder implements IEncoder {
         filenames.forEach(filename => {
           result[folder].push({
             filename,
-            data: images.get(filename) as string,
+            info: images.get(filename) as DeflateInfo,
           });
           images.delete(filename);
         });
@@ -86,9 +87,9 @@ export class PNGCollectionEncoder implements IEncoder {
 
     // Write all remaining files to `root`
     if (images.size) {
-      data.root = [...images.entries()].map(([filename, data]) => ({
+      data.root = [...images.entries()].map(([filename, info]) => ({
         filename,
-        data,
+        info,
       }));
     }
     return data;

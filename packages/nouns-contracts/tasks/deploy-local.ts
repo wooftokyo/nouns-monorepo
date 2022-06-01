@@ -6,6 +6,8 @@ import { Contract as EthersContract } from 'ethers';
 type ContractName =
   | 'WETH'
   | 'NFTDescriptor'
+  | 'NounsArt'
+  | 'SVGRenderer'
   | 'NounsDescriptor'
   | 'NounsSeeder'
   | 'NounsToken'
@@ -48,11 +50,16 @@ task('deploy-local', 'Deploy contracts to hardhat')
 
     const proxyRegistryAddress = '0xa5409ec958c83c3f309868babaca7c86dcb077c1';
 
-    const AUCTION_HOUSE_PROXY_NONCE_OFFSET = 7;
-    const GOVERNOR_N_DELEGATOR_NONCE_OFFSET = 10;
+    const DESCRIPTOR_NONCE_OFFSET = 4;
+    const AUCTION_HOUSE_PROXY_NONCE_OFFSET = 9;
+    const GOVERNOR_N_DELEGATOR_NONCE_OFFSET = 12;
 
     const [deployer] = await ethers.getSigners();
     const nonce = await deployer.getTransactionCount();
+    const expectedDescriptorAddress = ethers.utils.getContractAddress({
+      from: deployer.address,
+      nonce: nonce + DESCRIPTOR_NONCE_OFFSET,
+    });
     const expectedNounsDAOProxyAddress = ethers.utils.getContractAddress({
       from: deployer.address,
       nonce: nonce + GOVERNOR_N_DELEGATOR_NONCE_OFFSET,
@@ -64,7 +71,15 @@ task('deploy-local', 'Deploy contracts to hardhat')
     const contracts: Record<ContractName, Contract> = {
       WETH: {},
       NFTDescriptor: {},
+      NounsArt: {
+        args: [expectedDescriptorAddress],
+      },
+      SVGRenderer: {},
       NounsDescriptor: {
+        args: [
+          () => contracts['NounsArt'].instance?.address as string,
+          () => contracts['SVGRenderer'].instance?.address as string,
+        ],
         libraries: () => ({
           NFTDescriptor: contracts['NFTDescriptor'].instance?.address as string,
         }),

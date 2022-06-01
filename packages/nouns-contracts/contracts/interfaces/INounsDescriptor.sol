@@ -22,6 +22,8 @@ import { ISVGRenderer } from './ISVGRenderer.sol';
 import { INounsArt } from './INounsArt.sol';
 
 interface INounsDescriptor {
+    error PartsAreLocked();
+
     event PartsLocked();
 
     event ArtUpdated(INounsArt art);
@@ -52,23 +54,23 @@ interface INounsDescriptor {
 
     function addManyBackgrounds(string[] calldata backgrounds) external;
 
-    function addManyBodies(bytes[] calldata bodies) external;
+    function addManyBodies(INounsArt.NounArt[] calldata bodies) external;
 
-    function addManyAccessories(bytes[] calldata accessories) external;
+    function addManyAccessories(INounsArt.NounArt[] calldata accessories) external;
 
-    function addManyHeads(bytes[] calldata heads) external;
+    function addManyHeads(INounsArt.NounArt[] calldata heads) external;
 
-    function addManyGlasses(bytes[] calldata glasses) external;
+    function addManyGlasses(INounsArt.NounArt[] calldata glasses) external;
 
     function addBackground(string calldata background) external;
 
-    function addBody(bytes calldata body) external;
+    function addBody(INounsArt.NounArt calldata body) external;
 
-    function addAccessory(bytes calldata accessory) external;
+    function addAccessory(INounsArt.NounArt calldata accessory) external;
 
-    function addHead(bytes calldata head) external;
+    function addHead(INounsArt.NounArt calldata head) external;
 
-    function addGlasses(bytes calldata glasses) external;
+    function addGlasses(INounsArt.NounArt calldata glasses) external;
 
     function lockParts() external;
 

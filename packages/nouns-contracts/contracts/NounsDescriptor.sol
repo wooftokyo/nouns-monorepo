@@ -24,7 +24,6 @@ import { INounsSeeder } from './interfaces/INounsSeeder.sol';
 import { ISVGRenderer } from './interfaces/ISVGRenderer.sol';
 import { NFTDescriptor } from './libs/NFTDescriptor.sol';
 import { INounsArt } from './interfaces/INounsArt.sol';
-import { SSTORE2 } from './libs/SSTORE2.sol';
 
 contract NounsDescriptor is INounsDescriptor, Ownable {
     using Strings for uint256;
@@ -42,7 +41,9 @@ contract NounsDescriptor is INounsDescriptor, Ownable {
      * @notice Require that the parts have not been locked.
      */
     modifier whenPartsNotLocked() {
-        require(!arePartsLocked, 'Parts are locked');
+        if (arePartsLocked) {
+            revert PartsAreLocked();
+        }
         _;
     }
 
@@ -112,12 +113,7 @@ contract NounsDescriptor is INounsDescriptor, Ownable {
      * @dev This function can only be called by the owner.
      */
     function setPalette(uint8 paletteIndex, bytes calldata palette) external onlyOwner {
-        require(palette.length != 0, 'Empty palette');
-        require(palette.length % 3 == 0 && palette.length <= 768, 'Bad palette length');
-
-        address pointer = SSTORE2.write(palette);
-
-        art.setPalette(paletteIndex, pointer);
+        art.setPalette(paletteIndex, palette);
     }
 
     /**
@@ -132,7 +128,7 @@ contract NounsDescriptor is INounsDescriptor, Ownable {
      * @notice Batch add Noun bodies.
      * @dev This function can only be called by the owner when not locked.
      */
-    function addManyBodies(bytes[] calldata bodies) external onlyOwner whenPartsNotLocked {
+    function addManyBodies(INounsArt.NounArt[] calldata bodies) external onlyOwner whenPartsNotLocked {
         art.addManyBodies(bodies);
     }
 
@@ -140,7 +136,7 @@ contract NounsDescriptor is INounsDescriptor, Ownable {
      * @notice Batch add Noun accessories.
      * @dev This function can only be called by the owner when not locked.
      */
-    function addManyAccessories(bytes[] calldata accessories) external onlyOwner whenPartsNotLocked {
+    function addManyAccessories(INounsArt.NounArt[] calldata accessories) external onlyOwner whenPartsNotLocked {
         art.addManyAccessories(accessories);
     }
 
@@ -148,7 +144,7 @@ contract NounsDescriptor is INounsDescriptor, Ownable {
      * @notice Batch add Noun heads.
      * @dev This function can only be called by the owner when not locked.
      */
-    function addManyHeads(bytes[] calldata heads) external onlyOwner whenPartsNotLocked {
+    function addManyHeads(INounsArt.NounArt[] calldata heads) external onlyOwner whenPartsNotLocked {
         art.addManyHeads(heads);
     }
 
@@ -156,7 +152,7 @@ contract NounsDescriptor is INounsDescriptor, Ownable {
      * @notice Batch add Noun glasses.
      * @dev This function can only be called by the owner when not locked.
      */
-    function addManyGlasses(bytes[] calldata glasses) external onlyOwner whenPartsNotLocked {
+    function addManyGlasses(INounsArt.NounArt[] calldata glasses) external onlyOwner whenPartsNotLocked {
         art.addManyGlasses(glasses);
     }
 
@@ -172,7 +168,7 @@ contract NounsDescriptor is INounsDescriptor, Ownable {
      * @notice Add a Noun body.
      * @dev This function can only be called by the owner when not locked.
      */
-    function addBody(bytes calldata body) external onlyOwner whenPartsNotLocked {
+    function addBody(INounsArt.NounArt calldata body) external onlyOwner whenPartsNotLocked {
         art.addBody(body);
     }
 
@@ -180,7 +176,7 @@ contract NounsDescriptor is INounsDescriptor, Ownable {
      * @notice Add a Noun accessory.
      * @dev This function can only be called by the owner when not locked.
      */
-    function addAccessory(bytes calldata accessory) external onlyOwner whenPartsNotLocked {
+    function addAccessory(INounsArt.NounArt calldata accessory) external onlyOwner whenPartsNotLocked {
         art.addAccessory(accessory);
     }
 
@@ -188,7 +184,7 @@ contract NounsDescriptor is INounsDescriptor, Ownable {
      * @notice Add a Noun head.
      * @dev This function can only be called by the owner when not locked.
      */
-    function addHead(bytes calldata head) external onlyOwner whenPartsNotLocked {
+    function addHead(INounsArt.NounArt calldata head) external onlyOwner whenPartsNotLocked {
         art.addHead(head);
     }
 
@@ -196,7 +192,7 @@ contract NounsDescriptor is INounsDescriptor, Ownable {
      * @notice Add Noun glasses.
      * @dev This function can only be called by the owner when not locked.
      */
-    function addGlasses(bytes calldata glasses) external onlyOwner whenPartsNotLocked {
+    function addGlasses(INounsArt.NounArt calldata glasses) external onlyOwner whenPartsNotLocked {
         art.addGlasses(glasses);
     }
 
