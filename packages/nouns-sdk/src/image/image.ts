@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { DeflateInfo, ImageBounds, ImageRow, ImageRows, Rect, RGBAColor } from './types';
 import { rgbToHex, toPaddedHex } from './utils';
-import { deflateSync } from 'zlib';
+import { deflateRawSync } from 'zlib';
 
 /**
  * A class used to convert an image into the following RLE format:
@@ -77,10 +77,9 @@ export class Image {
     const rle = this.toRLE(getRgbaAt, colors);
     if (!this._compressed) {
       const buffer = Buffer.from(rle.replace('0x', ''), 'hex');
-      const data = deflateSync(buffer).toString('hex');
       this._compressed = {
         length: buffer.length,
-        data: `0x${data.substring(4, data.length - 8)}`, // Truncate header (first 2 bytes) and checksum (last 4 bytes).
+        data: `0x${deflateRawSync(buffer).toString('hex')}`,
       };
     }
     return this._compressed;
