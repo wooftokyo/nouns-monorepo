@@ -2,7 +2,7 @@ import { keccak256 as solidityKeccak256 } from '@ethersproject/solidity';
 import { BigNumber, BigNumberish } from '@ethersproject/bignumber';
 import { NounSeed, NounData } from './types';
 import { images, bgcolors } from './image-data.json';
-import { inflateSync } from 'zlib';
+import { inflateRawSync } from 'zlib';
 
 const { bodies, accessories, heads, glasses } = images;
 
@@ -19,19 +19,19 @@ export const getNounData = (seed: NounSeed): NounData => {
     parts: [
       {
         filename: _body.filename,
-        data: `0x${inflateSync(Buffer.from(_body.info.data, 'hex')).toString('hex')}`,
+        data: `0x${inflateRawSync(Buffer.from(_body.info.data, 'hex')).toString('hex')}`,
       },
       {
         filename: _accessory.filename,
-        data: `0x${inflateSync(Buffer.from(_accessory.info.data, 'hex')).toString('hex')}`,
+        data: `0x${inflateRawSync(Buffer.from(_accessory.info.data, 'hex')).toString('hex')}`,
       },
       {
         filename: _head.filename,
-        data: `0x${inflateSync(Buffer.from(_head.info.data, 'hex')).toString('hex')}`,
+        data: `0x${inflateRawSync(Buffer.from(_head.info.data, 'hex')).toString('hex')}`,
       },
       {
         filename: _glasses.filename,
-        data: `0x${inflateSync(Buffer.from(_glasses.info.data, 'hex')).toString('hex')}`,
+        data: `0x${inflateRawSync(Buffer.from(_glasses.info.data, 'hex')).toString('hex')}`,
       },
     ],
     background: bgcolors[seed.background],
