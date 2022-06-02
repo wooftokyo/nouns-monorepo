@@ -21,7 +21,8 @@ import {
   NounsToken,
   NounsDescriptor__factory as NounsDescriptorFactory,
   NounsDAOLogicV1Harness,
-  NounsDAOLogicV1Harness__factory as NounsDAOLogicV1HarnessFactory,
+  NounsDAOLogicV1Harness__factory as NounsDaoLogicV1HarnessFactory,
+  NounsDAOProxy__factory as NounsDaoProxyFactory,
 } from '../../../typechain';
 
 chai.use(solidity);
@@ -31,10 +32,10 @@ async function deployGovernor(
   deployer: SignerWithAddress,
   tokenAddress: string,
 ): Promise<NounsDAOLogicV1Harness> {
-  const { address: govDelegateAddress } = await new NounsDAOLogicV1HarnessFactory(
+  const { address: govDelegateAddress } = await new NounsDaoLogicV1HarnessFactory(
     deployer,
   ).deploy();
-  const params = [
+  const params: Parameters<NounsDaoProxyFactory['deploy']> = [
     address(0),
     tokenAddress,
     deployer.address,
@@ -50,7 +51,7 @@ async function deployGovernor(
     (await ethers.getContractFactory('NounsDAOProxy', deployer)) as ContractFactory
   ).deploy(...params);
 
-  return NounsDAOLogicV1HarnessFactory.connect(_govDelegatorAddress, deployer);
+  return NounsDaoLogicV1HarnessFactory.connect(_govDelegatorAddress, deployer);
 }
 
 let snapshotId: number;

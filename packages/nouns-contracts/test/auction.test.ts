@@ -10,7 +10,7 @@ import {
   NounsToken,
   WETH,
 } from '../typechain';
-import { deployNounsToken, deployWETH, populateDescriptor } from './utils';
+import { deployNounsToken, deployWeth, populateDescriptor } from './utils';
 
 chai.use(solidity);
 const { expect } = chai;
@@ -46,7 +46,7 @@ describe('NounsAuctionHouse', () => {
     [deployer, noundersDAO, bidderA, bidderB] = await ethers.getSigners();
 
     nounsToken = await deployNounsToken(deployer, noundersDAO.address, deployer.address);
-    weth = await deployWETH(deployer);
+    weth = await deployWeth(deployer);
     nounsAuctionHouse = await deploy(deployer);
 
     const descriptor = await nounsToken.descriptor();

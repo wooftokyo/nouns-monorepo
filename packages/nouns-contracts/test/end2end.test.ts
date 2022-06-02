@@ -10,16 +10,16 @@ import {
   NounsAuctionHouse__factory as NounsAuctionHouseFactory,
   NounsDescriptor,
   NounsDescriptor__factory as NounsDescriptorFactory,
-  NounsDAOProxy__factory as NounsDAOProxyFactory,
+  NounsDAOProxy__factory as NounsDaoProxyFactory,
   NounsDAOLogicV1,
-  NounsDAOLogicV1__factory as NounsDAOLogicV1Factory,
+  NounsDAOLogicV1__factory as NounsDaoLogicV1Factory,
   NounsDAOExecutor,
-  NounsDAOExecutor__factory as NounsDAOExecutorFactory,
+  NounsDAOExecutor__factory as NounsDaoExecutorFactory,
 } from '../typechain';
 
 import {
   deployNounsToken,
-  deployWETH,
+  deployWeth,
   populateDescriptor,
   address,
   encodeParameters,
@@ -71,7 +71,7 @@ async function deploy() {
 
   // Deployed by another account to simulate real network
 
-  weth = await deployWETH(wethDeployer);
+  weth = await deployWeth(wethDeployer);
 
   // nonce 2: Deploy AuctionHouse
   // nonce 3: Deploy nftDescriptorLibraryFactory
@@ -120,16 +120,16 @@ async function deploy() {
   });
 
   // 5b. DEPLOY NounsDAOExecutor with pre-computed Delegator address
-  timelock = await new NounsDAOExecutorFactory(deployer).deploy(
+  timelock = await new NounsDaoExecutorFactory(deployer).deploy(
     calculatedGovDelegatorAddress,
     TIME_LOCK_DELAY,
   );
 
   // 6. DEPLOY Delegate
-  const govDelegate = await new NounsDAOLogicV1Factory(deployer).deploy();
+  const govDelegate = await new NounsDaoLogicV1Factory(deployer).deploy();
 
   // 7a. DEPLOY Delegator
-  const nounsDAOProxy = await new NounsDAOProxyFactory(deployer).deploy(
+  const nounsDAOProxy = await new NounsDaoProxyFactory(deployer).deploy(
     timelock.address,
     nounsToken.address,
     noundersDAO.address, // NoundersDAO is vetoer
@@ -144,7 +144,7 @@ async function deploy() {
   expect(calculatedGovDelegatorAddress).to.equal(nounsDAOProxy.address);
 
   // 7b. CAST Delegator as Delegate
-  gov = NounsDAOLogicV1Factory.connect(nounsDAOProxy.address, deployer);
+  gov = NounsDaoLogicV1Factory.connect(nounsDAOProxy.address, deployer);
 
   // 8. SET Nouns owner to NounsDAOExecutor
   await nounsToken.transferOwnership(timelock.address);

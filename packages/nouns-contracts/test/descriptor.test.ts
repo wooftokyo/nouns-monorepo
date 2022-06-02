@@ -30,9 +30,9 @@ describe('NounsDescriptor', () => {
 
     for (const [l, layer] of Object.entries(ImageData.images)) {
       for (const [i, item] of layer.entries()) {
-        if (item.data.length > longest[l].length) {
+        if (item.info.data.length > longest[l].length) {
           longest[l] = {
-            length: item.data.length,
+            length: item.info.data.length,
             index: i,
           };
         }

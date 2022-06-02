@@ -45,8 +45,7 @@ const config: HardhatUserConfig = {
     clear: true,
   },
   typechain: {
-    outDir: 'typechain',
-    target: 'ethers-v5',
+    outDir: './typechain',
   },
   gasReporter: {
     enabled: !process.env.CI,

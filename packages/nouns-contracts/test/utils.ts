@@ -7,11 +7,11 @@ import {
   NounsToken__factory as NounsTokenFactory,
   NounsSeeder,
   NounsSeeder__factory as NounsSeederFactory,
-  WETH,
-  WETH__factory as WETHFactory,
   NFTDescriptor__factory as NFTDescriptorFactory,
   SVGRenderer__factory as SVGRendererFactory,
   NounsArt__factory as NounsArtFactory,
+  WETH,
+  WETH__factory as WethFactory,
 } from '../typechain';
 import ImageData from '../files/image-data.json';
 import { Block } from '@ethersproject/abstract-provider';
@@ -87,8 +87,8 @@ export const deployNounsToken = async (
   );
 };
 
-export const deployWETH = async (deployer?: SignerWithAddress): Promise<WETH> => {
-  const factory = new WETHFactory(deployer || (await getSigners()).deployer);
+export const deployWeth = async (deployer?: SignerWithAddress): Promise<WETH> => {
+  const factory = new WethFactory(deployer || (await getSigners()).deployer);
 
   return factory.deploy();
 };
@@ -101,12 +101,12 @@ export const populateDescriptor = async (nounsDescriptor: NounsDescriptor): Prom
   await Promise.all([
     nounsDescriptor.addManyBackgrounds(bgcolors),
     nounsDescriptor.setPalette(0, `0x000000${palette.join('')}`),
-    nounsDescriptor.addManyBodies(bodies.map(({ data }) => data)),
+    nounsDescriptor.addManyBodies(bodies.map(({ info }) => info)),
     chunkArray(accessories, 10).map(chunk =>
-      nounsDescriptor.addManyAccessories(chunk.map(({ data }) => data)),
+      nounsDescriptor.addManyAccessories(chunk.map(({ info }) => info)),
     ),
-    chunkArray(heads, 10).map(chunk => nounsDescriptor.addManyHeads(chunk.map(({ data }) => data))),
-    nounsDescriptor.addManyGlasses(glasses.map(({ data }) => data)),
+    chunkArray(heads, 10).map(chunk => nounsDescriptor.addManyHeads(chunk.map(({ info }) => info))),
+    nounsDescriptor.addManyGlasses(glasses.map(({ info }) => info)),
   ]);
 };
 
