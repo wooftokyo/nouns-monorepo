@@ -5,7 +5,11 @@ import { readPngImage } from './utils';
 
 const getExistingPalette = (version: string) => {
   const previousversion = Number(version.replace(/\D/g, '')) - 1;
-  const previousversionfile = path.join(__dirname, '../src', `image-data-v${previousversion}.json`);
+  const previousversionfile = path.join(
+    __dirname,
+    '../src',
+    `image-data-v${previousversion}-additions.json`,
+  );
 
   if (existsSync(previousversionfile)) {
     return JSON.parse(readFileSync(previousversionfile, { encoding: 'utf8' })).palette;
